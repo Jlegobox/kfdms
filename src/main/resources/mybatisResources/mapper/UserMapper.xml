@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.kfdms.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.mp.kfdms.domain.User">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="emial" jdbcType="VARCHAR" property="email" />
+        <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="user_type" jdbcType="INTEGER" property="user_type" />
+        <result column="verification_id" jdbcType="INTEGER" property="verification_id" />
+        <result column="active_status" jdbcType="INTEGER" property="active_status" />
+        <result column="base_folder_id" jdbcType="VARCHAR" property="base_folder_id"/>
+        <result column="image_path" jdbcType="VARCHAR" property="image_path"/>
+        <result column="register_time" jdbcType="TIME" property="tegister_time"/>
+        <result column="last_login" jdbcType="TIME" property="last_login"/>
+    </resultMap>
+    <select id="findAll" resultMap="BaseResultMap">
+        selec * from user;
+    </select>
+    <select id="findOneByUsername" resultType="com.mp.kfdms.domain.User" parameterType="com.mp.kfdms.domain.User">
+        select * from user where username=#{username} limit 1;
+    </select>
+    <select id="findOneByEmail" resultType="com.mp.kfdms.domain.User" parameterType="com.mp.kfdms.domain.User">
+        select * from user where email=#{email} limit 1;
+    </select>
+    <select id="findOneByTelephone" resultType="com.mp.kfdms.domain.User" parameterType="com.mp.kfdms.domain.User">
+        select * from user where telephone=#{telephone} limit 1;
+    </select>
+    <update id="changePassword" parameterType="com.mp.kfdms.domain.User">
+        update user set password=#{password} where email=#{eamil};
+    </update>
+    <update id="changeTelephone" parameterType="com.mp.kfdms.domain.User">
+        update user set telephone=#{telephone} where email=#{eamil};
+    </update>
+    <update id="login" parameterType="com.mp.kfdms.domain.User">
+        update user set last_login=now() where email=#{eamil} and password=#{password};
+    </update>
+    <delete id="deleteUser" parameterType="com.mp.kfdms.domain.User">
+        delete from user where email=#{email};
+    </delete>
+    <insert id="registerUser" parameterType="com.mp.kfdms.domain.User">
+        insert into user(email,username,password,verification) values (#{email},#{username},#{password},#{verification});
+    </insert>
+    <update id="activateUser" parameterType="com.mp.kfdms.domain.User">
+        update user set active_status=1 where email=#{eamil};
+    </update>
+    <update id="changeImagePath" parameterType="com.mp.kfdms.domain.User">
+        update user set image_path=#{image_path} where email=#{eamil};
+    </update>
+    <update id="changeUserName" parameterType="com.mp.kfdms.domain.User">
+        update user set username=#{username} where email=#{eamil};
+    </update>
+    <update id="setBaseFolderId" parameterType="com.mp.kfdms.domain.User">
+        update user set base_folder_id=#{base_folder_id} where email=#{eamil};
+    </update>
+
+</mapper>
