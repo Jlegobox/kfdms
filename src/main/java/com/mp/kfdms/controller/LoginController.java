@@ -49,7 +49,9 @@ public class LoginController {
     }
 
     @RequestMapping("/doLogin.ajax")
-    public String doLogin(HttpServletRequest request, HttpServletResponse response){
-        return "OK";
+    public String doLogin(final HttpServletRequest request, final HttpServletResponse response){
+        String return_msg = "error";
+        return_msg = userService.doLogin(request, response);
+        return return_msg;
     }
 }

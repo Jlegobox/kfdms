@@ -7,10 +7,10 @@ package com.mp.kfdms.pojo;
  * @Time 17:03
  */
 public class RegisterInfo {
-    public String email;
-    public String password;
-    public String verification_code;
-    public String time;
+    private String email;
+    private String password;
+    private String verification_code;
+    private String time;
 
     public String getEmail() {
         return email;

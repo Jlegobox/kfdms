@@ -28,13 +28,13 @@
         select * from user where telephone=#{telephone} limit 1;
     </select>
     <update id="changePassword" parameterType="com.mp.kfdms.domain.User">
-        update user set password=#{password} where email=#{eamil};
+        update user set password=#{password} where email=#{email};
     </update>
     <update id="changeTelephone" parameterType="com.mp.kfdms.domain.User">
-        update user set telephone=#{telephone} where email=#{eamil};
+        update user set telephone=#{telephone} where email=#{email};
     </update>
     <update id="login" parameterType="com.mp.kfdms.domain.User">
-        update user set last_login=now() where email=#{eamil} and password=#{password};
+        update user set last_login=now() where email=#{email} and password=#{password};
     </update>
     <delete id="deleteUser" parameterType="com.mp.kfdms.domain.User">
         delete from user where email=#{email};
@@ -43,16 +43,16 @@
         insert into user(email,username,password,verification) values (#{email},#{username},#{password},#{verification});
     </insert>
     <update id="activateUser" parameterType="com.mp.kfdms.domain.User">
-        update user set active_status=1 where email=#{eamil};
+        update user set active_status=1 where email=#{email};
     </update>
     <update id="changeImagePath" parameterType="com.mp.kfdms.domain.User">
-        update user set image_path=#{image_path} where email=#{eamil};
+        update user set image_path=#{image_path} where email=#{email};
     </update>
     <update id="changeUserName" parameterType="com.mp.kfdms.domain.User">
-        update user set username=#{username} where email=#{eamil};
+        update user set username=#{username} where email=#{email};
     </update>
     <update id="setBaseFolderId" parameterType="com.mp.kfdms.domain.User">
-        update user set base_folder_id=#{base_folder_id} where email=#{eamil};
+        update user set base_folder_id=#{base_folder_id} where email=#{email};
     </update>
 
 </mapper>
