@@ -27,6 +27,9 @@ public class UserUtil {
 
     public static User getUserFromToken(String token){
         final String encryptedStr = RSAKeyUtil.dncryption(token, RSAKeyUtil.getPrivateKey());
+        if(encryptedStr==null){
+            return null;
+        }
         LoginInfo loginInfo = GsonUtil.instance().fromJson(encryptedStr, LoginInfo.class);
         User user = new User();
         user.setEmail(loginInfo.getEmail());

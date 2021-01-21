@@ -7,4 +7,5 @@ package com.mp.kfdms.util;
  * @Time 17:51
  */
 public class FolderUtil {
+    public static int DEFAULT_MAX_SIZE=1024;
 }

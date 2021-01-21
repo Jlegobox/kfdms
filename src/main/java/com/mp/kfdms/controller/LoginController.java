@@ -42,9 +42,9 @@ public class LoginController {
     }
 
     @RequestMapping("doRegister.ajax")
-    public String doRegister(final HttpServletRequest request, final HttpSession session){
+    public String doRegister(final HttpServletRequest request, final HttpServletResponse response){
         String return_msg = "error";
-        return_msg = userService.doRegister(request, session);
+        return_msg = userService.doRegister(request, response);
         return return_msg;
     }
 

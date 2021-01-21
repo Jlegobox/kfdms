@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mp.kfdms.mapper.UserMapper">
-    <resultMap id="BaseResultMap" type="com.mp.kfdms.domain.User">
+    <resultMap id="UserResultMap" type="com.mp.kfdms.domain.User">
         <result column="id" jdbcType="INTEGER" property="id" />
         <result column="emial" jdbcType="VARCHAR" property="email" />
         <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
@@ -15,7 +15,7 @@
         <result column="register_time" jdbcType="TIME" property="tegister_time"/>
         <result column="last_login" jdbcType="TIME" property="last_login"/>
     </resultMap>
-    <select id="findAll" resultMap="BaseResultMap">
+    <select id="findAll" resultMap="UserResultMap">
         selec * from user;
     </select>
     <select id="findOneByUsername" resultType="com.mp.kfdms.domain.User" parameterType="com.mp.kfdms.domain.User">

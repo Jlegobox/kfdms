@@ -1,5 +1,6 @@
 package com.mp.kfdms.service;
 
+import com.mp.kfdms.mapper.FolderMapper;
 import com.mp.kfdms.mapper.UserMapper;
 import com.mp.kfdms.domain.User;
 import com.mp.kfdms.pojo.LoginInfo;
@@ -28,6 +29,12 @@ public class UserService {
     private UserMapper userMapper;
 
     @Resource
+    private FolderMapper folderMapper;
+
+    @Resource
+    private FolderService folderService;
+
+    @Resource
     private RSAKeyUtil rsaKeyUtil;
 
 
@@ -38,7 +45,7 @@ public class UserService {
         return GsonUtil.instance().toJson(publicKeyInfo);
     }
 
-    public String doRegister(final HttpServletRequest request, final HttpSession session){
+    public String doRegister(final HttpServletRequest request, final HttpServletResponse response){
         // todo 注册许可检验
         final String encrypted = request.getParameter("RegisterInfo");
         try{
@@ -67,6 +74,7 @@ public class UserService {
             }else {
                 int i = userMapper.registerUser(user);
                 if(i>0){
+                    String s = doActivate(request, response, user); // TODO: 2021/1/21 邮件激活
                     return_msg = "success";
                 }else {
                     return_msg = "error";
@@ -77,6 +85,28 @@ public class UserService {
             System.out.println(e);
             return "error";
         }
+    }
+
+    public String doActivate(final HttpServletRequest request, final HttpServletResponse response, User user){
+        String return_msg="error";
+        if(user == null){
+            user = UserUtil.getUserFromToken(request.getParameter("lg_token"));
+            if(user == null){
+                return return_msg;
+            }
+        }
+        try{
+            User oneByEmail = userMapper.findOneByEmail(user);
+            String baerFolder = folderService.createBaerFolder(oneByEmail);
+            if("error".equals(baerFolder)){
+                return_msg = "activate_error";// 激活策略
+            }else{
+                return_msg="success";
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return return_msg;
     }
 
     public String doLogin(final HttpServletRequest request, final HttpServletResponse response){

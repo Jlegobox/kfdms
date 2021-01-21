@@ -6,6 +6,7 @@ import com.mp.kfdms.service.FolderService;
 import com.mp.kfdms.service.UserService;
 import com.mp.kfdms.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,7 +26,7 @@ import java.io.IOException;
  * @Time 14:08
  */
 //@Controller
-@RestController("/")
+@Controller()
 public class WelcomeController {
     private static final String CHARSET_BY_AJAX = "text/html; charset=utf-8";
     @Autowired
@@ -36,10 +37,9 @@ public class WelcomeController {
     public FileService fileService;
 
     @RequestMapping(value = {"/"},produces = {CHARSET_BY_AJAX})
-//    @ResponseBody
     public void index(final HttpServletResponse response) throws IOException {
         response.sendRedirect("login.html");
-//        return "login.html"; 不知道为什么不能跳转，而是返回字符串
+//        return "login.html"; 不知道为什么不能跳转，而是返回字符串,因为之前加了RestfulController
     }
 
     @RequestMapping(value = {"/welcome"},produces = {CHARSET_BY_AJAX})

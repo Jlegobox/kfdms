@@ -21,7 +21,8 @@ import java.io.IOException;
  * @Date 2021/1/21
  * @Time 10:40
  */
-@RestController("/DataCloud")
+@RestController()
+@RequestMapping("/DataCloud")
 public class DataCloudController {
     @Autowired
     public UserService userservice;
@@ -31,20 +32,25 @@ public class DataCloudController {
     public FileService fileService;
 
     @RequestMapping(value = {"/createFolder.ajax"})
-    @ResponseBody
     public String createFolder(final HttpServletRequest request, final HttpServletResponse response){
-        folderService.createFolder(request,response);
-        return "success";
+        String return_msg = folderService.createFolder(request, response);
+        return return_msg;
     }
 
-    @RequestMapping(value = { "/doUploadFile.ajax" }) //使用filter来做编码设定,所以不需要 produces = { CHARSET_BY_AJAX }
-    @ResponseBody
-    public String douploadFile(final HttpServletRequest request, final HttpServletResponse response,
-                               @RequestParam("file1") final MultipartFile file) throws IOException {
-        String base_path="C:\\Users\\J\\GitHub\\DFDMS\\kfdms\\src\\main\\resources\\tem_files";
-        File tem_file = new File(base_path+"\\"+"new_file.xls");
-        tem_file.createNewFile();
-        file.transferTo(tem_file);
+//    @RequestMapping(value = { "/doUploadFile.ajax" })
+//    public String douploadFile(final HttpServletRequest request, final HttpServletResponse response,
+//                               @RequestParam("file1") final MultipartFile file) throws IOException {
+//        String base_path="C:\\Users\\J\\GitHub\\DFDMS\\kfdms\\src\\main\\resources\\tem_files";
+//        File tem_file = new File(base_path+"\\"+"new_file.xls");
+//        tem_file.createNewFile();
+//        file.transferTo(tem_file);
+//        return "OK";
+//    }
+
+    @RequestMapping("/doUploadFile.ajax") //使用filter来做编码设定,所以不需要 produces = { CHARSET_BY_AJAX }
+    public String doUploadFile(final HttpServletRequest request, final HttpServletResponse response,
+                               @RequestParam("upload_file") final MultipartFile file){
+        fileService.doUploadFile(request, response, file);
         return "OK";
     }
 }

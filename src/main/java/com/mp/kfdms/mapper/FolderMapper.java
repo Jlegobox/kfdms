@@ -12,4 +12,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface FolderMapper {
     public Folder getFolderById(Folder folder);
+    public int createFolder(Folder folder);
+    public int getFolderByName(Folder folder);
 }

@@ -26,6 +26,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/home/**.ajax");
+                .addPathPatterns("/home/**.ajax")
+                .addPathPatterns("/DataCloud/**.ajax");
     }
 }

@@ -15,6 +15,8 @@ public class Folder {
     public int folder_owner_id;
     public int folder_type;
     public int is_private;
+    public int folder_size;
+    public int folder_max_size;
     public String folder_description;
     public Date folder_create_time;
     public Date folder_modified_time;
@@ -65,6 +67,22 @@ public class Folder {
 
     public void setIs_private(int is_private) {
         this.is_private = is_private;
+    }
+
+    public int getFolder_size() {
+        return folder_size;
+    }
+
+    public void setFolder_size(int folder_size) {
+        this.folder_size = folder_size;
+    }
+
+    public int getFolder_max_size() {
+        return folder_max_size;
+    }
+
+    public void setFolder_max_size(int folder_max_size) {
+        this.folder_max_size = folder_max_size;
     }
 
     public String getFolder_description() {
