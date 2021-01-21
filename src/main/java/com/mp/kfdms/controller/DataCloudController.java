@@ -1,5 +1,7 @@
 package com.mp.kfdms.controller;
 
+import com.mp.kfdms.service.FileService;
+import com.mp.kfdms.service.FolderService;
 import com.mp.kfdms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,17 +18,26 @@ import java.io.IOException;
 /**
  * @Author J
  * @Email jlc_game123@163.com
- * @Date 2021/1/10
- * @Time 14:08
+ * @Date 2021/1/21
+ * @Time 10:40
  */
-//@Controller
-@RestController
-public class HomeController {
-    private static final String CHARSET_BY_AJAX = "text/html; charset=utf-8";
+@RestController("/DataCloud")
+public class DataCloudController {
     @Autowired
     public UserService userservice;
+    @Autowired
+    public FolderService folderService;
+    @Autowired
+    public FileService fileService;
 
-//    @RequestMapping(value = { "/douploadFile.ajax" }, produces = { CHARSET_BY_AJAX })
+    @RequestMapping(value = {"/createFolder.ajax"})
+    @ResponseBody
+    public String createFolder(final HttpServletRequest request, final HttpServletResponse response){
+        folderService.createFolder(request,response);
+        return "success";
+    }
+
+    @RequestMapping(value = { "/doUploadFile.ajax" }) //使用filter来做编码设定,所以不需要 produces = { CHARSET_BY_AJAX }
     @ResponseBody
     public String douploadFile(final HttpServletRequest request, final HttpServletResponse response,
                                @RequestParam("file1") final MultipartFile file) throws IOException {

@@ -33,7 +33,7 @@ public class UploadController {
      * @param file
      * @return
      */
-    @RequestMapping("/doUploadFile.ajax")
+//    @RequestMapping("/doUploadFile.ajax")
     @ResponseBody
     public String doUploadFile(final HttpServletRequest request, final HttpServletResponse response,
                            @RequestParam("upload_file") final MultipartFile file){

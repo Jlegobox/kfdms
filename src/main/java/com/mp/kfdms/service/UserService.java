@@ -7,6 +7,7 @@ import com.mp.kfdms.pojo.PublicKeyInfo;
 import com.mp.kfdms.pojo.RegisterInfo;
 import com.mp.kfdms.util.GsonUtil;
 import com.mp.kfdms.util.RSAKeyUtil;
+import com.mp.kfdms.util.UserUtil;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,9 +30,6 @@ public class UserService {
     @Resource
     private RSAKeyUtil rsaKeyUtil;
 
-    public static long REGISTER_TIME = 3000000L;
-    public static long LOGIN_TIME = 3000000L;
-    public static long TOKEN_VALIDITY = 12*3600*1000L;
 
     public String getPublicKey(){
         PublicKeyInfo publicKeyInfo = new PublicKeyInfo();
@@ -48,7 +46,7 @@ public class UserService {
             RegisterInfo registerInfo = GsonUtil.instance().fromJson(encryptedStr, RegisterInfo.class);
             String return_msg="error";
             // 注册信息验证
-            if(System.currentTimeMillis() - Long.parseLong(registerInfo.getTime()) > REGISTER_TIME){
+            if(System.currentTimeMillis() - Long.parseLong(registerInfo.getTime()) > UserUtil.REGISTER_TIME){
                 return "register_time_out";
             }
             // email不能为空 todo 交给前端
@@ -56,7 +54,7 @@ public class UserService {
                 return "error";
             }
 
-            // 搜集注册所需信息
+            // 搜集注册所需信息 todo 用户密码加密
             User user = new User();
             user.setEmail(registerInfo.getEmail());
             user.setPassword(registerInfo.getPassword());
@@ -89,7 +87,7 @@ public class UserService {
             LoginInfo loginInfo = GsonUtil.instance().fromJson(encryptedStr, LoginInfo.class);
             String return_msg="error";
             // 登录信息验证
-            if(System.currentTimeMillis() - Long.parseLong(loginInfo.getTime()) > REGISTER_TIME){
+            if(System.currentTimeMillis() - Long.parseLong(loginInfo.getTime()) > UserUtil.REGISTER_TIME){
                 return "register_time_out";
             }
 
@@ -101,7 +99,7 @@ public class UserService {
 
             int count = userMapper.login(user);
             if(count>0){ //找到user
-                String token = updateToken(loginInfo);
+                String token = UserUtil.updateToken(loginInfo);
                 response.setHeader("lg_token", token);
                 return_msg = "success";
             }else {
@@ -114,15 +112,10 @@ public class UserService {
         }
     }
 
-    public static String updateToken(LoginInfo loginInfo){
-        loginInfo.setTime(System.currentTimeMillis() + TOKEN_VALIDITY + "");
-        String json_str = GsonUtil.instance().toJson(loginInfo);
-        return RSAKeyUtil.encryption(json_str, RSAKeyUtil.getPublicKey());
+    public boolean checkToken(String token){
+        User userFromToken = UserUtil.getUserFromToken(token);
+        int login = userMapper.login(userFromToken);
+        return login>0;
     }
 
-    public static String updateToken(String token){
-        final String encryptedStr = RSAKeyUtil.dncryption(token, RSAKeyUtil.getPrivateKey());
-        LoginInfo loginInfo = GsonUtil.instance().fromJson(encryptedStr, LoginInfo.class);
-        return updateToken(loginInfo);
-    }
 }
