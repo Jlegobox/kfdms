@@ -1,13 +1,14 @@
 package com.mp.kfdms.controller;
 
+import com.mp.kfdms.domain.Folder;
+import com.mp.kfdms.domain.User;
 import com.mp.kfdms.service.FileService;
 import com.mp.kfdms.service.FolderService;
 import com.mp.kfdms.service.UserService;
+import com.mp.kfdms.util.GsonUtil;
+import com.mp.kfdms.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,28 @@ public class DataCloudController {
     public String createFolder(final HttpServletRequest request, final HttpServletResponse response){
         String return_msg = folderService.createFolder(request, response);
         return return_msg;
+    }
+
+    /**
+     * 根据folder_id返回文件夹下文件包括文件夹
+     * @param request
+     * @param folder_id
+     * @return
+     */
+    @RequestMapping(value = {"/listFolders.ajax"})
+    public String listFolders(final HttpServletRequest request, @RequestParam("folder_id") int folder_id){
+        String return_msg="error";
+        if(folder_id == 0){
+            User user = UserUtil.getUserFromToken(request.getHeader("lg_token"));
+            Folder baseFolder = folderService.getBaseFolderByUser(user);
+            folder_id = baseFolder.getFolder_id();
+        }
+        String folders = folderService.listFolders(request, folder_id);
+        if("error".equals(folders)){
+            return return_msg;
+        }else {
+            return folders;
+        }
     }
 
 //    @RequestMapping(value = { "/doUploadFile.ajax" })

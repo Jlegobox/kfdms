@@ -26,4 +26,10 @@
     <select id="getFolderByName" parameterType="com.mp.kfdms.domain.Folder" resultType="com.mp.kfdms.domain.Folder">
         select * FROM folder where folder_parent_id=#{folder_parent_id} and folder_name=#{folder_name};
     </select>
+    <select id="getFolderByFolderParentId" parameterType="java.lang.Integer" resultType="com.mp.kfdms.domain.Folder">
+        select * from folder where folder_parent_id=#{folder_parent_id}
+    </select>
+    <select id="getBaseFolderByUser" parameterType="com.mp.kfdms.domain.User" resultType="com.mp.kfdms.domain.Folder">
+        select * from folder where folder_parent_id=0 and folder_owner_id=#{id};
+    </select>
 </mapper>

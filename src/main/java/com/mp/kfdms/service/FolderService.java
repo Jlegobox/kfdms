@@ -5,6 +5,7 @@ import com.mp.kfdms.domain.User;
 import com.mp.kfdms.mapper.FolderMapper;
 import com.mp.kfdms.mapper.UserMapper;
 import com.mp.kfdms.util.FolderUtil;
+import com.mp.kfdms.util.GsonUtil;
 import com.mp.kfdms.util.RequestUtil;
 import com.mp.kfdms.util.UserUtil;
 import org.springframework.data.relational.core.sql.In;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @Author J
@@ -46,9 +48,6 @@ public class FolderService {
         return folder;
     }
 
-    public static void main(String[] args) {
-        System.out.println();
-    }
     public String createBaerFolder(User user){
         Folder folder = new Folder();
         folder.setFolder_name(user.getUsername());
@@ -65,6 +64,14 @@ public class FolderService {
         }
     }
 
+    public Folder getBaseFolderByUser(User user){
+        if(user.getId() == 0){
+            user = userMapper.findOneByEmail(user);
+        }
+        Folder baseFolderByUser = folderMapper.getBaseFolderByUser(user);
+        return baseFolderByUser;
+    }
+
     public String createFolder(final HttpServletRequest request, final HttpServletResponse response){
         Folder folder = wrapFolder(request);
         int count = folderMapper.createFolder(folder);
@@ -73,6 +80,11 @@ public class FolderService {
         }else {
             return "error";
         }
+    }
+
+    public String listFolders(final HttpServletRequest request,int folder_id){
+        List<Folder> folders = folderMapper.getFolderByFolderParentId(folder_id);
+        return GsonUtil.instance().toJson(folders);
     }
 
 }

@@ -26,6 +26,9 @@ public class UserUtil {
     }
 
     public static User getUserFromToken(String token){
+        if(token == null || token.length()<10){
+            return null;
+        }
         final String encryptedStr = RSAKeyUtil.dncryption(token, RSAKeyUtil.getPrivateKey());
         if(encryptedStr==null){
             return null;
