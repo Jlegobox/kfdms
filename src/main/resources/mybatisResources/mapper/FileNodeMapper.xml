@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.kfdms.mapper.FileNodeMapper">
+    <insert id="addNewFile" parameterType="com.mp.kfdms.domain.FileNode">
+        insert into filenode(file_encode_name,file_name,file_folder_id,file_owner_id,file_type,data_type,
+        file_description,file_size,file_md5,file_permission)values (
+        #{file_encode_name},#{file_name},#{file_folder_id},#{file_owner_id},#{file_type},#{data_type},
+        #{file_description},#{file_size},#{file_md5},#{file_permission}
+        )
+    </insert>
+</mapper>

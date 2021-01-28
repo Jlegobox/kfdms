@@ -42,5 +42,8 @@ src/test/
 src/main/resources/static/**
 src/main/resources/templates/
 src/main/resources/tem_files/
+src/main/resources/APPDATA/
+
+APPDATA/
 
 

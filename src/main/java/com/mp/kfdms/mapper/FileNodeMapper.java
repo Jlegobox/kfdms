@@ -19,7 +19,7 @@ public interface FileNodeMapper {
      * @param fileNode
      * @return
      */
-    public FileNode findFileByName(FileNode fileNode);
+    public FileNode getFileByName(FileNode fileNode);
 
     /**
      * 添加一个文件
@@ -40,6 +40,6 @@ public interface FileNodeMapper {
      * @param fileNode
      * @return
      */
-    public FileNode findFileByMD5(FileNode fileNode);
+    public FileNode getFileByMD5(FileNode fileNode);
 
 }

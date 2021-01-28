@@ -10,6 +10,7 @@ import com.mp.kfdms.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -71,9 +72,14 @@ public class DataCloudController {
 //    }
 
     @RequestMapping("/doUploadFile.ajax") //使用filter来做编码设定,所以不需要 produces = { CHARSET_BY_AJAX }
-    public String doUploadFile(final HttpServletRequest request, final HttpServletResponse response,
-                               @RequestParam("upload_file") final MultipartFile file){
-        fileService.doUploadFile(request, response, file);
+    public String doUploadFile(final MultipartHttpServletRequest request){
+        fileService.doUploadFile(request);
         return "OK";
     }
+
+    @RequestMapping("testupload.ajax")
+    public String testWebUpload(final MultipartHttpServletRequest request){
+        return "success";
+    }
+
 }

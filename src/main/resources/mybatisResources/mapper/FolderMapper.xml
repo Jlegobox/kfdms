@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mp.kfdms.mapper.FolderMapper">
-    <resultMap id="FolderResultMap" type="com.mp.kfdms.domain.User">
+    <resultMap id="FolderResultMap" type="com.mp.kfdms.domain.Folder">
         <result column="folder_id" jdbcType="INTEGER" property="folder_id" />
         <result column="folder_name" jdbcType="VARCHAR" property="folder_name" />
         <result column="folder_parent_id" jdbcType="INTEGER" property="folder_parent_id"/>
@@ -15,7 +15,7 @@
         <result column="folder_modified_time" jdbcType="TIME" property="folder_modified_time"/>
     </resultMap>
     <select id="getFolderById" parameterType="com.mp.kfdms.domain.Folder" resultMap="FolderResultMap">
-        SELECT * FROM folder where id=#{folder_id};
+        SELECT * FROM folder where folder_id=#{folder_id};
     </select>
     <insert id="createFolder" parameterType="com.mp.kfdms.domain.Folder">
         insert into folder(folder_name, folder_parent_id, folder_owner_id,
