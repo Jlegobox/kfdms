@@ -1,10 +1,14 @@
 package com.mp.kfdms.controller;
 
+import com.mp.kfdms.domain.FileNode;
 import com.mp.kfdms.domain.Folder;
 import com.mp.kfdms.domain.User;
+import com.mp.kfdms.pojo.FolderView;
+import com.mp.kfdms.pojo.PageParam;
 import com.mp.kfdms.service.FileService;
 import com.mp.kfdms.service.FolderService;
 import com.mp.kfdms.service.UserService;
+import com.mp.kfdms.util.FolderUtil;
 import com.mp.kfdms.util.GsonUtil;
 import com.mp.kfdms.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author J
@@ -33,53 +40,80 @@ public class DataCloudController {
     @Autowired
     public FileService fileService;
 
+    // 新建文件夹
     @RequestMapping(value = {"/createFolder.ajax"})
     public String createFolder(final HttpServletRequest request, final HttpServletResponse response){
-        String return_msg = folderService.createFolder(request, response);
-        return return_msg;
+        String returnMsg = folderService.createFolder(request, response);
+        return returnMsg;
+    }
+    // 获得导航栏数据
+    @RequestMapping("/getNavigation.ajax")
+    public String getNavigation(final HttpServletRequest request, @RequestParam("folderId") final int folderId){
+        List<Folder> parentFolders = folderService.getParentFolder(folderId);
+        return GsonUtil.instance().toJson(parentFolders);
     }
 
-    /**
-     * 根据folder_id返回文件夹下文件包括文件夹
-     * @param request
-     * @param folder_id
-     * @return
-     */
-    @RequestMapping(value = {"/listFolders.ajax"})
-    public String listFolders(final HttpServletRequest request, @RequestParam("folder_id") int folder_id){
-        String return_msg="error";
-        if(folder_id == 0){
-            User user = UserUtil.getUserFromToken(request.getHeader("lg_token"));
-            Folder baseFolder = folderService.getBaseFolderByUser(user);
-            folder_id = baseFolder.getFolder_id();
-        }
-        String folders = folderService.listFolders(request, folder_id);
-        if("error".equals(folders)){
-            return return_msg;
+    // 加载文件夹内容
+    @RequestMapping("/loadFolder.ajax")
+    public String loadFolder(final HttpServletRequest request, @RequestParam("folderId") int folderId, PageParam pageParam){
+        // TODO: 2021/1/29 添加pageParam
+        String returnMsg="error";
+        // 文件夹权限判断
+        User currentUser = UserUtil.getUserFromToken(request.getHeader("lg_token"));
+        Folder currentFolder = folderService.getCurrentFolder(currentUser, folderId);
+        if(currentFolder == null){
+            return returnMsg;
         }else {
-            return folders;
+            //权限校验
+            String permission = folderService.checkFolderPermission(currentUser, currentFolder);
         }
+        // 新建文件夹视图
+        FolderView folderView = new FolderView();
+        // 找到文件夹内所有数据的数量
+        int totalCount = folderService.getTotalCount(currentFolder);
+        pageParam.setTotalCount(totalCount);
+        pageParam.setTotalPage((int) Math.ceil(totalCount/pageParam.getPageSize()));
+        folderView.setPageParam(pageParam);
+
+        // 文件夹内文件夹逻辑
+        List<Folder> folders = folderService.listFolders(request, currentFolder);
+        ArrayList<Folder> checkedFolders = new ArrayList<>();
+        ArrayList<String> foldersPermission = new ArrayList<>();
+        for (Folder folder : folders) { //文件夹权限校验
+            String permission = folderService.checkFolderPermission(currentUser, folder);
+            // TODO: 2021/1/29 对于不需要展示的，不应当传输至前端，节约带宽
+            checkedFolders.add(folder);
+            foldersPermission.add(permission);
+        }
+        folderView.setFolders(checkedFolders);
+        folderView.setFoldersPermission(foldersPermission);
+        // 文件夹逻辑类似
+        List<FileNode> fileNodes = fileService.listFiles(request, currentFolder);
+        ArrayList<FileNode> checkedFiles = new ArrayList<>();
+        ArrayList<String> filesPermission = new ArrayList<>();
+        for (FileNode fileNode : fileNodes) {
+            String permission = fileService.checkFilePermission(currentUser, fileNode);
+            checkedFiles.add(fileNode);
+            filesPermission.add(permission);
+        }
+        folderView.setFiles(checkedFiles);
+        folderView.setFilesPermission(filesPermission);
+
+        return GsonUtil.instance().toJson(folderView);
     }
 
-//    @RequestMapping(value = { "/doUploadFile.ajax" })
-//    public String douploadFile(final HttpServletRequest request, final HttpServletResponse response,
-//                               @RequestParam("file1") final MultipartFile file) throws IOException {
-//        String base_path="C:\\Users\\J\\GitHub\\DFDMS\\kfdms\\src\\main\\resources\\tem_files";
-//        File tem_file = new File(base_path+"\\"+"new_file.xls");
-//        tem_file.createNewFile();
-//        file.transferTo(tem_file);
-//        return "OK";
-//    }
 
+
+    // 上传文件
     @RequestMapping("/doUploadFile.ajax") //使用filter来做编码设定,所以不需要 produces = { CHARSET_BY_AJAX }
     public String doUploadFile(final MultipartHttpServletRequest request){
         fileService.doUploadFile(request);
         return "OK";
     }
-
-    @RequestMapping("testupload.ajax")
-    public String testWebUpload(final MultipartHttpServletRequest request){
-        return "success";
+    // 下载文件
+    @RequestMapping("/downloadFile.do")
+    public String downloadFile(final HttpServletRequest request, final HttpServletResponse response, @RequestParam("fileId") final String fileId){
+        return fileService.downloadFile(request,response,fileId);
     }
 
 }

@@ -8,13 +8,16 @@ import com.mp.kfdms.util.FolderUtil;
 import com.mp.kfdms.util.GsonUtil;
 import com.mp.kfdms.util.RequestUtil;
 import com.mp.kfdms.util.UserUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author J
@@ -29,6 +32,9 @@ public class FolderService {
 
     @Resource
     private FolderMapper folderMapper;
+
+    @Autowired
+    private FileService fileService;
 
     public Folder wrapFolder(final HttpServletRequest request){
         Folder folder = new Folder();
@@ -82,9 +88,47 @@ public class FolderService {
         }
     }
 
+    public List<Folder> listFolders(final HttpServletRequest request, Folder currentFolder){
+        return folderMapper.getFolderByFolderParentId(currentFolder.getFolder_id());
+    }
     public String listFolders(final HttpServletRequest request,int folder_id){
         List<Folder> folders = folderMapper.getFolderByFolderParentId(folder_id);
         return GsonUtil.instance().toJson(folders);
     }
 
+    public Folder getCurrentFolder(User currentUser, int folderId) {
+        Folder currentFolder = new Folder();
+        currentFolder.setFolder_id(folderId);
+        currentFolder = folderMapper.getFolderById(currentFolder);
+        if(currentFolder == null){ // 找不到文件
+            currentFolder = getBaseFolderByUser(currentUser);
+        }
+        return currentFolder;
+    }
+    public String checkFolderPermission(User currentUser, Folder folder){
+        return "success";
+    }
+
+    public List<Folder> getParentFolder(int folderId) {
+        Folder currentFolder = new Folder();
+        currentFolder.setFolder_id(folderId);
+        currentFolder = folderMapper.getFolderById(currentFolder);
+        if(currentFolder == null)
+            return null;
+        ArrayList<Folder> folders = new ArrayList<Folder>();
+        folders.add(currentFolder);
+        while(currentFolder.getFolder_parent_id() != 0){
+            currentFolder = folderMapper.getParentFolderByFolderParentId(currentFolder.getFolder_parent_id());
+            if(currentFolder == null)
+                break;
+            folders.add(currentFolder);
+        }
+        return folders;
+    }
+
+    public int getTotalCount(Folder currentFolder) {
+        int i = folderMapper.countFolder(currentFolder);
+        int j = fileService.getTotalCount(currentFolder);
+        return i+j;
+    }
 }

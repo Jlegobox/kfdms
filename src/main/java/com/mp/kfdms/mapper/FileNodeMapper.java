@@ -1,6 +1,7 @@
 package com.mp.kfdms.mapper;
 
 import com.mp.kfdms.domain.FileNode;
+import com.mp.kfdms.domain.Folder;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.io.File;
@@ -42,4 +43,12 @@ public interface FileNodeMapper {
      */
     public FileNode getFileByMD5(FileNode fileNode);
 
+    public List<FileNode> getFileByFileFolderId(FileNode fileNode);
+
+    /**
+     * 根据folder id查找folder下所有文件数目
+     * @param folder
+     * @return
+     */
+    public int countFile(Folder folder);
 }

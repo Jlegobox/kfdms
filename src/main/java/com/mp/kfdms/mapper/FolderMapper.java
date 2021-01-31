@@ -20,4 +20,12 @@ public interface FolderMapper {
     public List<Folder> getFolderByFolderParentId(int folder_id);
 
     public Folder getBaseFolderByUser(User user);
+    public Folder getParentFolderByFolderParentId(int folder_parent_id);
+
+    /**
+     * 根据folder id查找folder下所有文件夹数目
+     * @param currentFolder
+     * @return
+     */
+    public int countFolder(Folder currentFolder);
 }

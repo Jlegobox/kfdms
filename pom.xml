@@ -82,6 +82,12 @@
             <artifactId>gson</artifactId>
         </dependency>
 
+        // log4j日志模块
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

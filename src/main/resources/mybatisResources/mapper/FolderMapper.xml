@@ -32,4 +32,10 @@
     <select id="getBaseFolderByUser" parameterType="com.mp.kfdms.domain.User" resultType="com.mp.kfdms.domain.Folder">
         select * from folder where folder_parent_id=0 and folder_owner_id=#{id};
     </select>
+    <select id="getParentFolderByFolderParentId" parameterType="java.lang.Integer" resultType="com.mp.kfdms.domain.Folder">
+        select * from folder where folder_id=#{folder_parent_id} limit 1
+    </select>
+    <select id="countFolder" parameterType="com.mp.kfdms.domain.Folder" resultType="java.lang.Integer">
+        select count(folder_id) from folder where folder_parent_id=#{folder_id};
+    </select>
 </mapper>

@@ -16,8 +16,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import java.io.*;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -36,6 +37,10 @@ public class FileService {
 
     @Resource
     private FolderMapper folderMapper;
+
+    public int getTotalCount(Folder currentFolder) {
+        return fileNodeMapper.countFile(currentFolder);
+    }
 
 
     public String doUploadFile(final MultipartHttpServletRequest request) {
@@ -86,5 +91,52 @@ public class FileService {
         } else {
             return "error";
         }
+    }
+
+    public String downloadFile(HttpServletRequest request, final HttpServletResponse response, String fileId) {
+        String fileName = "test.txt";
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("multipart/form-data");
+        response.setHeader("Content-Disposition", "attachment;fileName="
+                + fileName);
+        try {
+            String path = "C:\\Users\\J\\GitHub\\kfdms\\APPDATA" + "\\" + fileName;
+            InputStream inputStream = new FileInputStream(new File(path));
+
+            OutputStream os = response.getOutputStream();
+            byte[] b = new byte[2048];
+            int length;
+            while ((length = inputStream.read(b)) > 0) {
+                os.write(b, 0, length);
+            }
+
+            // 这里主要关闭。
+            os.close();
+
+            inputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+    public List<FileNode> listFiles(final HttpServletRequest request, final Folder currentFolder){
+        FileNode fileNode = new FileNode();
+        fileNode.setFile_folder_id(currentFolder.getFolder_id());
+        return fileNodeMapper.getFileByFileFolderId(fileNode);
+    }
+    public String listFiles(final HttpServletRequest request, final int folderId){
+        String returnMsg = "error";
+        FileNode fileNode = new FileNode();
+        fileNode.setFile_folder_id(folderId);
+
+        fileNodeMapper.getFileByFileFolderId(fileNode);
+        return returnMsg;
+    }
+
+    public String checkFilePermission(User currentUser,FileNode fileNode){
+        return "success";
     }
 }
