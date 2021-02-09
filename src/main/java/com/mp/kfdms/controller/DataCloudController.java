@@ -12,6 +12,7 @@ import com.mp.kfdms.util.FolderUtil;
 import com.mp.kfdms.util.GsonUtil;
 import com.mp.kfdms.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -34,18 +35,55 @@ import java.util.Map;
 @RequestMapping("/DataCloud")
 public class DataCloudController {
     @Autowired
-    public UserService userservice;
+    public UserService userService;
     @Autowired
     public FolderService folderService;
     @Autowired
     public FileService fileService;
 
+    //返回root文件夹id
+    @RequestMapping("getDeskFolderId.ajax")
+    public String getDeskFolderId(final HttpServletRequest request){
+        User currentUser = null;
+        try{
+            currentUser = UserUtil.getUserFromToken(request.getHeader("lg_token"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(currentUser == null)
+        {
+            return "error";
+        }
+        Folder baseFolderByUser = folderService.getBaseFolderByUser(currentUser);
+        return GsonUtil.instance().toJson(baseFolderByUser.getFolder_id());
+    }
+
     // 新建文件夹
     @RequestMapping(value = {"/createFolder.ajax"})
     public String createFolder(final HttpServletRequest request, final HttpServletResponse response){
-        String returnMsg = folderService.createFolder(request, response);
+        String returnMsg = "error";
+        returnMsg = folderService.createFolder(request);
         return returnMsg;
     }
+
+    /**
+     * 删除文件or文件夹
+     * @param request
+     * @param fileId
+     * @param fileType
+     * @return
+     */
+    @RequestMapping("deleteFile.ajax")
+    public String deleteFile(final HttpServletRequest request,final int fileId, final int fileType){
+        String returnMSG = "error";
+        if(fileType == 1){ // 文件夹
+            returnMSG = folderService.deleteFolder(request, fileId);
+        }else{
+            returnMSG = fileService.deleteFile(request, fileId);
+        }
+        return returnMSG;
+    }
+
     // 获得导航栏数据
     @RequestMapping("/getNavigation.ajax")
     public String getNavigation(final HttpServletRequest request, @RequestParam("folderId") final int folderId){
@@ -114,6 +152,15 @@ public class DataCloudController {
     @RequestMapping("/downloadFile.do")
     public String downloadFile(final HttpServletRequest request, final HttpServletResponse response, @RequestParam("fileId") final String fileId){
         return fileService.downloadFile(request,response,fileId);
+    }
+
+    // 上传前校验
+    @RequestMapping("/checkUploadFile.ajax")
+    public String checkUploadFile(final MultipartHttpServletRequest request, final int folderId){
+        String returnMSG="error";
+
+        returnMSG = fileService.checkUploadFile(request, folderId);
+        return returnMSG;
     }
 
 }

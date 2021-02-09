@@ -19,8 +19,13 @@ public class RequestUtil {
      * @param parameterName
      * @return
      */
-    public static int getInt(HttpServletRequest request,String parameterName){
+    public static int getInt(final HttpServletRequest request,final String parameterName){
         String parameter = request.getParameter(parameterName);
         return parameter==null?0:Integer.parseInt(parameter);
+    }
+
+    public static String getStr(final HttpServletRequest request,final String parameterName){
+        String parameter = request.getParameter(parameterName);
+        return parameter==null?"":parameter;
     }
 }

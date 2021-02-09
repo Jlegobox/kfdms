@@ -39,7 +39,7 @@ public class WelcomeController {
     @RequestMapping(value = {"/"},produces = {CHARSET_BY_AJAX})
     public void index(final HttpServletResponse response) throws IOException {
         response.sendRedirect("login.html");
-//        return "login.html"; 不知道为什么不能跳转，而是返回字符串,因为之前加了RestfulController
+//        return "login.html"; 直接返回字符串不能跳转，因为之前加了RestfulController，返回字符串而不是视图
     }
 
     @RequestMapping(value = {"/welcome"},produces = {CHARSET_BY_AJAX})

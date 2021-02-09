@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Mapper
 public interface FolderMapper {
-    public Folder getFolderById(Folder folder);
+    public Folder getFolderById(int folderId);
     public int createFolder(Folder folder);
     public int getFolderByName(Folder folder);
     public List<Folder> getFolderByFolderParentId(int folder_id);
@@ -28,4 +28,6 @@ public interface FolderMapper {
      * @return
      */
     public int countFolder(Folder currentFolder);
+
+    public int deleteFolderById(int folderId);
 }

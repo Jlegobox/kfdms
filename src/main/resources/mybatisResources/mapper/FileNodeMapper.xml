@@ -8,10 +8,16 @@
         #{file_description},#{file_size},#{file_md5},#{file_permission}
         )
     </insert>
-    <select id="getFileByFileFolderId" parameterType="com.mp.kfdms.domain.FileNode" resultType="com.mp.kfdms.domain.FileNode">
+    <select id="getFileByFileFolderId" parameterType="java.lang.Integer" resultType="com.mp.kfdms.domain.FileNode">
         select * from filenode where file_folder_id = #{file_folder_id};
     </select>
     <select id="countFile" parameterType="com.mp.kfdms.domain.Folder" resultType="java.lang.Integer">
         select count(file_id) from filenode where file_folder_id=#{folder_id};
     </select>
+    <select id="getFolderById" parameterType="java.lang.Integer" resultType="com.mp.kfdms.domain.FileNode">
+        select * from filenode where file_id = #{fileId} limit 1;
+    </select>
+    <delete id="deleteFileById" parameterType="java.lang.Integer">
+        delete from filenode where file_id = #{fileId}
+    </delete>
 </mapper>

@@ -43,7 +43,7 @@ public interface FileNodeMapper {
      */
     public FileNode getFileByMD5(FileNode fileNode);
 
-    public List<FileNode> getFileByFileFolderId(FileNode fileNode);
+    public List<FileNode> getFileByFileFolderId(int fileNode);
 
     /**
      * 根据folder id查找folder下所有文件数目
@@ -51,4 +51,7 @@ public interface FileNodeMapper {
      * @return
      */
     public int countFile(Folder folder);
+
+    public int deleteFileById(int fileId);
+    public FileNode getFileById(int fileId);
 }

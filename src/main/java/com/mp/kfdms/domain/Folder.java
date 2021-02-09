@@ -13,6 +13,7 @@ public class Folder {
     public String folder_name;
     public int folder_parent_id;
     public int folder_owner_id;
+    public String folder_owner_name;
     public int folder_type;
     public int is_private;
     public int folder_size;
@@ -51,6 +52,14 @@ public class Folder {
 
     public void setFolder_owner_id(int folder_owner_id) {
         this.folder_owner_id = folder_owner_id;
+    }
+
+    public String getFolder_owner_name() {
+        return folder_owner_name;
+    }
+
+    public void setFolder_owner_name(String folder_owner_name) {
+        this.folder_owner_name = folder_owner_name;
     }
 
     public int getFolder_type() {

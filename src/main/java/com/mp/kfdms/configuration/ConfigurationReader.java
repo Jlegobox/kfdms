@@ -10,6 +10,8 @@ package com.mp.kfdms.configuration;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 配置文件的统一类，包括所有涉及到的配置项目的集合
@@ -18,9 +20,10 @@ import java.io.File;
  * 整体的配置会写到一个总的配置文件中，如果不存在此配置文件，才会重新初始化配置文件。
  * 定时对配置进行持久化。关机前会持久化配置
  */
-//@Configuration
+@Configuration
 public class ConfigurationReader {
     private static volatile ConfigurationReader instance;
+    private Map<String,String> configurations;
     private String path;
     private String confdir;
     private ServerConfiguration serverConfig;
@@ -38,10 +41,15 @@ public class ConfigurationReader {
     };
 
     public ConfigurationReader(){
-        this.path = System.getProperty("user.dir");
-        this.confdir = this.path + File.separator + "conf" + File.separator;
-        this.serverConfig = new ServerConfiguration();
-        this.dataSourceConfig = new DataSourceConfiguration();
+//        this.path = System.getProperty("user.dir");
+//        this.confdir = this.path + File.separator + "conf" + File.separator;
+//        this.serverConfig = new ServerConfiguration();
+//        this.dataSourceConfig = new DataSourceConfiguration();
+        configurations = new HashMap<String,String>();
+    }
+
+    public String getConf(String key){
+        return configurations.get(key);
     }
 
 

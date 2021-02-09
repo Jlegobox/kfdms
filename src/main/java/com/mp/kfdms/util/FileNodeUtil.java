@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @Author J
@@ -59,5 +60,46 @@ public class FileNodeUtil {
             }
         }
         return "file";
+    }
+
+    public static String renameFileByStrategy(String renameFileStrategy, List<FileNode> files, MultipartFile uploadFile) throws Exception {
+        String uploadFilename = uploadFile.getOriginalFilename();
+        // 根据renameFileStrategy选择重命名策略
+        switch (renameFileStrategy){
+            default: {
+                uploadFilename = renameFileByDefault(files, uploadFilename);
+            }
+        }
+        return uploadFilename;
+    }
+
+    private static String renameFileByDefault(List<FileNode> files, String uploadFilename) throws Exception {
+        int regexIndex=0;
+        if(uploadFilename != null){
+            for(int i = uploadFilename.length()-1; i>=0; i--){
+                if(uploadFilename.charAt(i) == '.'){
+                    regexIndex = i;
+                    break;
+                }
+            }
+            String preName = uploadFilename.substring(0, regexIndex);
+            String postfix = uploadFilename.substring(regexIndex);
+            boolean renameFlag = true;
+            while (renameFlag){
+                preName = preName + "(1)";
+                uploadFilename = preName + '.'+postfix;
+                renameFlag=false;
+                for (FileNode file : files) {
+                    if(file.equals(files)){
+                        renameFlag=true;
+                        break;
+                    }
+                }
+                if(uploadFilename.length()>255){
+                    throw new Exception("rename error");
+                }
+            }
+        }
+        return uploadFilename;
     }
 }

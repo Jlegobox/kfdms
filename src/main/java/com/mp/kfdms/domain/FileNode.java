@@ -14,6 +14,7 @@ public class FileNode {
     private String file_name;
     private int file_folder_id;
     private int file_owner_id;
+    private String file_owner_name;
     private int file_type;
     private String data_type;
     private String file_description;
@@ -65,6 +66,14 @@ public class FileNode {
         this.file_owner_id = file_owner_id;
     }
 
+    public String getFile_owner_name() {
+        return file_owner_name;
+    }
+
+    public void setFile_owner_name(String file_owner_name) {
+        this.file_owner_name = file_owner_name;
+    }
+
     public int getFile_type() {
         return file_type;
     }
@@ -101,8 +110,8 @@ public class FileNode {
         return file_md5;
     }
 
-    public void setFile_md5(String file_MD5) {
-        this.file_md5 = file_MD5;
+    public void setFile_md5(String file_md5) {
+        this.file_md5 = file_md5;
     }
 
     public int getFile_permission() {

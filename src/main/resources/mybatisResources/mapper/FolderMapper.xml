@@ -6,6 +6,7 @@
         <result column="folder_name" jdbcType="VARCHAR" property="folder_name" />
         <result column="folder_parent_id" jdbcType="INTEGER" property="folder_parent_id"/>
         <result column="folder_owner_id" jdbcType="INTEGER" property="folder_owner_id" />
+        <result column="folder_owner_name" jdbcType="INTEGER" property="folder_owner_name"/>
         <result column="folder_type" jdbcType="INTEGER" property="folder_type"/>
         <result column="is_private" jdbcType="INTEGER" property="is_private" />
         <result column="folder_size" jdbcType="INTEGER" property="folder_size" />
@@ -14,13 +15,13 @@
         <result column="folder_create_time" jdbcType="TIME" property="folder_create_time"/>
         <result column="folder_modified_time" jdbcType="TIME" property="folder_modified_time"/>
     </resultMap>
-    <select id="getFolderById" parameterType="com.mp.kfdms.domain.Folder" resultMap="FolderResultMap">
+    <select id="getFolderById" parameterType="java.lang.Integer" resultMap="FolderResultMap">
         SELECT * FROM folder where folder_id=#{folder_id};
     </select>
     <insert id="createFolder" parameterType="com.mp.kfdms.domain.Folder">
-        insert into folder(folder_name, folder_parent_id, folder_owner_id,
+        insert into folder(folder_name, folder_parent_id, folder_owner_id,folder_owner_name,
         folder_type, is_private,folder_size,folder_max_size,folder_description)
-        values (#{folder_name}, #{folder_parent_id}, #{folder_owner_id},
+        values (#{folder_name}, #{folder_parent_id}, #{folder_owner_id},#{folder_owner_name},
         #{folder_type}, #{is_private},#{folder_size},#{folder_max_size},#{folder_description});
     </insert>
     <select id="getFolderByName" parameterType="com.mp.kfdms.domain.Folder" resultType="com.mp.kfdms.domain.Folder">
@@ -30,7 +31,7 @@
         select * from folder where folder_parent_id=#{folder_parent_id}
     </select>
     <select id="getBaseFolderByUser" parameterType="com.mp.kfdms.domain.User" resultType="com.mp.kfdms.domain.Folder">
-        select * from folder where folder_parent_id=0 and folder_owner_id=#{id};
+        select * from folder where folder_parent_id=0 and folder_owner_id=#{id} limit 1;
     </select>
     <select id="getParentFolderByFolderParentId" parameterType="java.lang.Integer" resultType="com.mp.kfdms.domain.Folder">
         select * from folder where folder_id=#{folder_parent_id} limit 1
@@ -38,4 +39,7 @@
     <select id="countFolder" parameterType="com.mp.kfdms.domain.Folder" resultType="java.lang.Integer">
         select count(folder_id) from folder where folder_parent_id=#{folder_id};
     </select>
+    <delete id="deleteFolderById" parameterType="java.lang.Integer">
+        delete from folder where  folder_id = #{folderId}
+    </delete>
 </mapper>

@@ -148,4 +148,21 @@ public class UserService {
         return login>0;
     }
 
+    public User getUserFromToken(String token){
+        User userFromToken = UserUtil.getUserFromToken(token);
+        User detailUser = null;
+        if(userFromToken != null){
+            detailUser = userMapper.findOneByEmail(userFromToken);
+        }
+        return detailUser;
+
+    }
+
+    public boolean checkUploadAuth(User user) {
+        return true;
+    }
+
+    public boolean checkDeleteAuth() {
+        return true;
+    }
 }
