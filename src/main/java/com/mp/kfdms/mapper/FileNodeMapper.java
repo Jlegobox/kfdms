@@ -38,10 +38,10 @@ public interface FileNodeMapper {
 
     /**
      * 根据文件MD5值返回文件
-     * @param fileNode
+     * @param MD5
      * @return
      */
-    public FileNode getFileByMD5(FileNode fileNode);
+    public List<FileNode> getFileByMD5(String MD5);
 
     public List<FileNode> getFileByFileFolderId(int fileNode);
 

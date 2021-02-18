@@ -18,6 +18,9 @@
         select * from filenode where file_id = #{fileId} limit 1;
     </select>
     <delete id="deleteFileById" parameterType="java.lang.Integer">
-        delete from filenode where file_id = #{fileId}
+        delete from filenode where file_id = #{fileId};
     </delete>
+    <select id="getFileByMD5" parameterType="java.lang.String" resultType="com.mp.kfdms.domain.FileNode">
+        select * from filenode where file_md5 = #{MD5};
+    </select>
 </mapper>

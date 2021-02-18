@@ -3,6 +3,7 @@ package com.mp.kfdms.controller;
 import com.mp.kfdms.domain.FileNode;
 import com.mp.kfdms.domain.Folder;
 import com.mp.kfdms.domain.User;
+import com.mp.kfdms.pojo.FileInfo;
 import com.mp.kfdms.pojo.FolderView;
 import com.mp.kfdms.pojo.PageParam;
 import com.mp.kfdms.service.FileService;
@@ -144,8 +145,8 @@ public class DataCloudController {
 
     // 上传文件
     @RequestMapping("/doUploadFile.ajax") //使用filter来做编码设定,所以不需要 produces = { CHARSET_BY_AJAX }
-    public String doUploadFile(final MultipartHttpServletRequest request){
-        fileService.doUploadFile(request);
+    public String doUploadFile(final MultipartHttpServletRequest request, int folderId){
+        fileService.doUploadFile(request,folderId);
         return "OK";
     }
     // 下载文件
@@ -156,11 +157,26 @@ public class DataCloudController {
 
     // 上传前校验
     @RequestMapping("/checkUploadFile.ajax")
-    public String checkUploadFile(final MultipartHttpServletRequest request, final int folderId){
+    public String checkUploadFile(final HttpServletRequest request, final int folderId){
         String returnMSG="error";
+        // todo 未来完成FileInfo的自定义注入，基于SpringMVC自定义参数解析器
 
         returnMSG = fileService.checkUploadFile(request, folderId);
         return returnMSG;
+    }
+    // 分片校验
+    @RequestMapping("/checkUploadFileSlice.ajax")
+    public String checkUploadFileSlice(final HttpServletRequest request){
+        boolean existFlag = fileService.checkUploadFileSlice(request);
+        if(existFlag){
+            return "exists";
+        }
+        return "permit";
+    }
+
+    @RequestMapping("/completeUploadFile.ajax")
+    public String completeUploadFile(final HttpServletRequest request, final int folderId){
+        return fileService.completeUploadFile(request, folderId);
     }
 
 }
