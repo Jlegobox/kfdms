@@ -21,28 +21,16 @@ public class FileUtil {
     // TODO: 2021/1/28 使用绝对路径提供自定义文件保存路径的功能，默认初始化为APPDATA
     private static String BASE_URL = "C:\\Users\\J\\GitHub\\kfdms\\APPDATA";
 
-    public static File getFolderByMD5(String MD5) {
-        File file = new File(BASE_URL + File.separator + MD5);
-        if(file.exists()&& file.isDirectory())
-            return file;
-        return null;
-    }
-
     /**
-     * 判断文件夹路径path是否存在，不存在则创建空文件夹。创建失败返回false
-     *
-     * @param path
+     * 根据文件总MD5返回保存对应文件分片的文件夹File，不存在此文件夹则尝试创建这个文件夹。
+     * @param MD5
      * @return
      */
-    public synchronized static boolean checkDirect(String path) {
-        File file = new File(path);
-        if (!file.exists() && !file.isDirectory()) {
-            System.out.println("不存在文件目录路径:" + path);
-            return file.mkdir();
-        } else {
-            System.out.println("目录存在");
-            return true;
-        }
+    public static File getSliceDirByMD5(String MD5) {
+        File file = new File(BASE_URL + File.separator + MD5);
+        if(!file.exists() || !file.isDirectory())
+            file.mkdir();
+        return file;
     }
 
     public synchronized static boolean deleteDirect(File sliceDir) {
@@ -67,7 +55,7 @@ public class FileUtil {
         return true;
     }
 
-    public synchronized static boolean deleteSliceDirect(FileInfo fileInfo){
+    public synchronized static boolean deleteSliceDir(FileInfo fileInfo){
         return deleteDirect(new File(BASE_URL + File.separator + fileInfo.getMD5()));
     }
 
@@ -83,7 +71,6 @@ public class FileUtil {
             File[] files = savedDir.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    System.out.println(name);
                     return name.endsWith(".slice");
                 }
             });
@@ -113,7 +100,7 @@ public class FileUtil {
         FileChannel fileOutputStream = null;
         FileChannel fileInputStream = null;
         try{
-            fileOutputStream = new FileOutputStream(destFile).getChannel();
+            fileOutputStream = new FileOutputStream(destFile,true).getChannel();// 追加模式
             fileInputStream = new FileInputStream(originFile).getChannel();
             fileOutputStream.transferFrom(fileInputStream, fileOutputStream.size(),fileInputStream.size());
         }finally {
@@ -130,7 +117,7 @@ public class FileUtil {
     public static File saveSlice(MultipartFile uploadFile, FileInfo fileInfo) {
         String md5 = fileInfo.getMD5();
         String DirPath = BASE_URL + File.separator + md5;
-        if (!checkDirect(DirPath)) { // 创建文件夹失败，服务器错误
+        if (getSliceDirByMD5(md5).exists()) { // 创建文件夹失败，服务器错误
             return null;
         }
 
@@ -156,7 +143,7 @@ public class FileUtil {
         }
     }
 
-    private static synchronized FileInfo refreshFileInfo(FileInfo fileInfo) throws Exception{
+    public static synchronized FileInfo refreshFileInfo(FileInfo fileInfo) throws Exception{
         File file = new File(BASE_URL + File.separator + fileInfo.getMD5() + File.separator + fileInfo.getMD5() + ".INFO");
         if(!file.exists()){
             saveFileInfo(file,fileInfo);
@@ -211,7 +198,7 @@ public class FileUtil {
     }
 
     public synchronized static FileInfo getFileInfo(FileInfo fileInfo) throws Exception{
-        File file = new File(BASE_URL + File.separator + fileInfo.getMD5());
+        File file = new File(BASE_URL + File.separator + fileInfo.getMD5() + File.separator + fileInfo.getMD5() + ".INFO");
         return getFileInfo(file);
     }
 
@@ -293,7 +280,7 @@ public class FileUtil {
     }
 
     public static File getFileEntity(FileInfo localFileInfo) {
-        File file = new File(BASE_URL + File.separator + localFileInfo.getMD5() + "block");
+        File file = new File(BASE_URL + File.separator + localFileInfo.getMD5() + ".block");
         if(file.exists())
             return file;
         return null;

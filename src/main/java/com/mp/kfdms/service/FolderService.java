@@ -64,7 +64,7 @@ public class FolderService {
         return folder;
     }
 
-    public String createBaerFolder(User user){
+    public String createBaseFolder(User user){
         Folder folder = new Folder();
         folder.setFolder_name(user.getUsername());
         folder.setFolder_parent_id(0); // 0为底文件
@@ -72,6 +72,7 @@ public class FolderService {
         folder.setFolder_owner_name(user.getUsername());
         folder.setFolder_type(0); // 0为私有
         folder.setFolder_size(0);
+        folder.setFolder_description("");
         folder.setFolder_max_size(FolderUtil.DEFAULT_MAX_SIZE);
         int count = folderMapper.createFolder(folder);
         if(count>0){

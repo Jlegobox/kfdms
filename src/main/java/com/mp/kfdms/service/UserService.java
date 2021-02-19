@@ -97,7 +97,7 @@ public class UserService {
         }
         try{
             User oneByEmail = userMapper.findOneByEmail(user);
-            String baerFolder = folderService.createBaerFolder(oneByEmail);
+            String baerFolder = folderService.createBaseFolder(oneByEmail);
             if("error".equals(baerFolder)){
                 return_msg = "activate_error";// 激活策略
             }else{

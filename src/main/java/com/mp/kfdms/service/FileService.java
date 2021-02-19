@@ -8,10 +8,7 @@ import com.mp.kfdms.mapper.FileNodeMapper;
 import com.mp.kfdms.mapper.FolderMapper;
 import com.mp.kfdms.mapper.UserMapper;
 import com.mp.kfdms.pojo.FileInfo;
-import com.mp.kfdms.util.FileUtil;
-import com.mp.kfdms.util.MD5Util;
-import com.mp.kfdms.util.RequestUtil;
-import com.mp.kfdms.util.UserUtil;
+import com.mp.kfdms.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
@@ -59,9 +56,6 @@ public class FileService {
         FileInfo fileInfo = RequestUtil.collectFileInfo(request);
         FileUtil.saveSlice(upload_file,fileInfo);
 
-        // 判断是否需要合并
-        FileUtil.mergeSlice(fileInfo);
-
         return "success";
     }
 
@@ -69,9 +63,12 @@ public class FileService {
         // 验证登录状态和上传权限
         User currentUser = UserUtil.getUserFromToken(request.getHeader("lg_token"));
         currentUser = userMapper.findOneByEmail(currentUser);
+        if(currentUser == null)
+            return "authError";
 
         // 从request中获取MD5
         FileInfo fileInfo = RequestUtil.collectFileInfo(request);
+
         // 获取上传路径（当前文件夹）
         if (folderId == 0) {
             return "error";
@@ -79,6 +76,8 @@ public class FileService {
         Folder folder = new Folder();
         folder.setFolder_id(folderId);
         folder = folderMapper.getFolderById(folder.getFolder_id());
+        if(folder == null)
+            return "error";
 
         // 根据文件的MD5获取上传文件的FileNode对象
         FileInfo localFileInfo = null;
@@ -99,26 +98,11 @@ public class FileService {
             }
         }
 
-        //创建数据库对象
-        FileNode fileNode = new FileNode();
-        // UUID作为名称
-        fileNode.setFile_encode_name(UUID.randomUUID().toString());
-        fileNode.setFile_name(localFileInfo.getOriginFileName());
-        fileNode.setFile_folder_id(folder.getFolder_id());
-        fileNode.setFile_owner_id(currentUser.getId());
-        fileNode.setFile_owner_name(currentUser.getUsername());
-        fileNode.setFile_type(1);// 默认私有
-        fileNode.setData_type(FileUtil.getDataType(localFileInfo.getFileType()));
-        fileNode.setFile_description("");//默认为空
-        fileNode.setFile_size(localFileInfo.getFileSize());
-        fileNode.setFile_md5(localFileInfo.getMD5());
-        fileNode.setFile_permission(0);
-
-        fileNode.setFile_create_time(new Date(System.currentTimeMillis()));
-
-        // 在数据库中储存新建信息并更新文件夹信息
+        FileNode fileNode = UploadFileLogUtil.createFileNode(localFileInfo, folder, currentUser);
+        // 在数据库中储存新建文件信息并更新文件夹信息
         fileNodeMapper.addNewFile(fileNode);
 
+        FileUtil.deleteSliceDir(localFileInfo);
         return "success";
     }
 
@@ -181,6 +165,8 @@ public class FileService {
         FileInfo fileInfo = RequestUtil.collectFileInfo(request);
 
         User user = userService.getUserFromToken(request.getHeader("lg_token"));
+        user = userMapper.findOneByEmail(user);
+
         // 校验上传权限
         boolean uploadAuth = userService.checkUploadAuth(user);
         if(!uploadAuth)
@@ -198,7 +184,7 @@ public class FileService {
         }
         if(renameFlag){
             String renameFileStrategy = ConfigurationReader.instance().getConf("renameFileStrategy");
-            if(!"false".equals(renameFileStrategy)) { // 自动重命名
+            if(renameFileStrategy != null && !"true".equals(renameFileStrategy)) { // 自动重命名
                 String new_fileName="new upload file";
                 try {
                     new_fileName = FileUtil.renameFileByStrategy(renameFileStrategy, files, fileInfo);
@@ -222,10 +208,41 @@ public class FileService {
     }
 
     public boolean quickSave(FileInfo fileInfo, User user, int folderId){
-        // 秒传功能，不重复上传文件，而是直接创建文件记录并与服务器中文件形成映射
+        // 秒传功能，直接进行数据库数据的更新
+        // 更新失败，则按照正常流程重新上传
+        // 创建文件夹
+        File sliceDirByMD5 = FileUtil.getSliceDirByMD5(fileInfo.getMD5());
+        try {
+            FileUtil.refreshFileInfo(fileInfo);
+            Folder folder = new Folder();
+            folder.setFolder_id(folderId);
+            FileNode fileNode = UploadFileLogUtil.createFileNode(fileInfo, folder, user);
+            fileNodeMapper.addNewFile(fileNode);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
         return true;
     }
 
+    public boolean checkUploadFileSlice(HttpServletRequest request) {
+        FileInfo fileInfo = RequestUtil.collectFileInfo(request);
+        String fileName = fileInfo.getCurrentChunk() + ".slice";
+        File folderByMD5 = FileUtil.getSliceDirByMD5(fileInfo.getMD5());
+        if(folderByMD5!=null){
+            File sliceFile = new File(folderByMD5.getPath() + File.separator + fileName);
+            if(sliceFile.exists()){
+                try{
+                    String md5 = MD5Util.calMD5(sliceFile);
+                    return fileInfo.getCurrentChunkMD5().equals(md5);
+                }catch (IOException e){
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
 
     public String deleteFile(HttpServletRequest request, int fileId) {
         User user = UserUtil.getUserFromToken(request.getHeader("lg_token"));
@@ -240,25 +257,5 @@ public class FileService {
             }
         }
         return "error";
-    }
-
-    public boolean checkUploadFileSlice(HttpServletRequest request) {
-        FileInfo fileInfo = RequestUtil.collectFileInfo(request);
-        String fileName = fileInfo.getCurrentChunk() + ".slice";
-        File folderByMD5 = FileUtil.getFolderByMD5(fileInfo.getMD5());
-        if(folderByMD5!=null){
-            File[] files = folderByMD5.listFiles();
-            if(files!=null && files.length>0){
-                for (File file : files) {
-                    try{
-                        String md5 = MD5Util.calMD5(file);
-                        return fileName.equals(file.getName()) && fileInfo.getCurrentChunkMD5().equals(md5);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        return false;
     }
 }
