@@ -53,5 +53,6 @@ public interface FileNodeMapper {
     public int countFile(Folder folder);
 
     public int deleteFileById(int fileId);
+
     public FileNode getFileById(int fileId);
 }

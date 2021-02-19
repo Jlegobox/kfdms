@@ -155,12 +155,8 @@ public class FolderService {
             if(totalCountFile + totalCountFolder>0)
                 return "not empty";
             int count = folderMapper.deleteFolderById(fileId);
-            if(count>1)
+            if(count>=1)
                 return "success";
-            else {
-                Folder folderById = folderMapper.getFolderById(fileId);
-                return folderById==null?"success":"error";
-            }
         }
         return "error";
     }

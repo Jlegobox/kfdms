@@ -117,7 +117,7 @@ public class FileUtil {
     public static File saveSlice(MultipartFile uploadFile, FileInfo fileInfo) {
         String md5 = fileInfo.getMD5();
         String DirPath = BASE_URL + File.separator + md5;
-        if (getSliceDirByMD5(md5).exists()) { // 创建文件夹失败，服务器错误
+        if (!getSliceDirByMD5(md5).exists()) { // 创建文件夹失败，服务器错误
             return null;
         }
 

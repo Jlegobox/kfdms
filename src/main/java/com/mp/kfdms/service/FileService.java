@@ -87,6 +87,7 @@ public class FileService {
                 return "error";
         }catch (Exception e){
             e.printStackTrace();
+            return "error";
         }
 
         // 判断是否需要合并
@@ -249,12 +250,8 @@ public class FileService {
         boolean auth = userService.checkDeleteAuth();
         if(auth){
             int count = fileNodeMapper.deleteFileById(fileId);
-            if(count>1)
+            if(count>=1)
                 return "success";
-            else { // 已经被删除
-                FileNode fileById = fileNodeMapper.getFileById(fileId);
-                return fileById==null?"success":"error";
-            }
         }
         return "error";
     }
