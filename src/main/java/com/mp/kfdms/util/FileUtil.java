@@ -285,4 +285,8 @@ public class FileUtil {
             return file;
         return null;
     }
+
+    public static synchronized boolean deleteFile(File fileEntity) {
+        return fileEntity.delete();
+    }
 }

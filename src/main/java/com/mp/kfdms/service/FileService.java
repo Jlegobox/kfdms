@@ -231,6 +231,9 @@ public class FileService {
         String fileName = fileInfo.getCurrentChunk() + ".slice";
         File folderByMD5 = FileUtil.getSliceDirByMD5(fileInfo.getMD5());
         if(folderByMD5!=null){
+            // 验证INFO文件
+
+            // 验证分片
             File sliceFile = new File(folderByMD5.getPath() + File.separator + fileName);
             if(sliceFile.exists()){
                 try{
@@ -249,10 +252,30 @@ public class FileService {
         User user = UserUtil.getUserFromToken(request.getHeader("lg_token"));
         boolean auth = userService.checkDeleteAuth();
         if(auth){
+            FileNode deleteFile = fileNodeMapper.getFileById(fileId);
             int count = fileNodeMapper.deleteFileById(fileId);
-            if(count>=1)
+            if(count>=1){
+                cleanFileEntity(deleteFile.getFile_md5());
                 return "success";
+            }
+
         }
         return "error";
+    }
+
+    /**
+     * 清除服务器的上传文件实体，删除了实体的话返回false
+     * @param fileMD5
+     * @return
+     */
+    public boolean cleanFileEntity(String fileMD5){
+        List<FileNode> fileByMD5 = fileNodeMapper.getFileByMD5(fileMD5);
+        if(fileByMD5.size() == 0){
+            FileInfo fileInfo = new FileInfo();
+            fileInfo.setMD5(fileMD5);
+            File fileEntity = FileUtil.getFileEntity(fileInfo);
+            return FileUtil.deleteFile(fileEntity);
+        }
+        return false;
     }
 }

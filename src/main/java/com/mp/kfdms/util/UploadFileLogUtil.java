@@ -28,7 +28,7 @@ public class UploadFileLogUtil {
         fileNode.setFile_owner_id(user.getId());
         fileNode.setFile_owner_name(user.getUsername());
         fileNode.setFile_type(1);// 默认私有
-        fileNode.setData_type(FileUtil.getDataType(fileInfo.getFileType()));
+        fileNode.setData_type(fileInfo.getFileType());
         fileNode.setFile_description("");//默认为空
         fileNode.setFile_size(fileInfo.getFileSize());
         fileNode.setFile_md5(fileInfo.getMD5());

@@ -14,8 +14,8 @@
     <select id="countFile" parameterType="com.mp.kfdms.domain.Folder" resultType="java.lang.Integer">
         select count(file_id) from filenode where file_folder_id=#{folder_id};
     </select>
-    <select id="getFolderById" parameterType="java.lang.Integer" resultType="com.mp.kfdms.domain.FileNode">
-        select * from filenode where file_id = #{fileId} limit 1;
+    <select id="getFileById" parameterType="java.lang.Integer" resultType="com.mp.kfdms.domain.FileNode">
+        select * from filenode where file_id = #{fileId};
     </select>
     <delete id="deleteFileById" parameterType="java.lang.Integer">
         delete from filenode where file_id = #{fileId};
