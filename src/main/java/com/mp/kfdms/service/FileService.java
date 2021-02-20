@@ -79,31 +79,35 @@ public class FileService {
         if(folder == null)
             return "error";
 
-        // 根据文件的MD5获取上传文件的FileNode对象
+        // 根据文件的MD5获取上传文件的FileInfo对象
         FileInfo localFileInfo = null;
         try{
             localFileInfo = FileUtil.getFileInfo(fileInfo);
             if(localFileInfo == null)
                 return "error";
+            // 判断是否需要合并
+            File fileEntity = FileUtil.getFileEntity(localFileInfo);
+            if(fileEntity == null){
+                fileEntity = FileUtil.mergeSlice(fileInfo);
+                if(fileEntity == null){
+                    return "error";
+                }
+            }
+
+            FileNode fileNode = UploadFileLogUtil.createFileNode(localFileInfo, folder, currentUser);
+            // 在数据库中储存新建文件信息并更新文件夹信息
+            fileNodeMapper.addNewFile(fileNode);
         }catch (Exception e){
             e.printStackTrace();
             return "error";
+        }finally {
+            /**
+             * 因为已经到了最后一步，因此不管最后合并是否成功，最后都需要清理文件夹
+             * 为了防止因为INFO文件的问题导致的错误，因此从传入的fileInfo中获取MD5值
+             */
+            FileUtil.deleteSliceDir(fileInfo);
         }
 
-        // 判断是否需要合并
-        File fileEntity = FileUtil.getFileEntity(localFileInfo);
-        if(fileEntity == null){
-            fileEntity = FileUtil.mergeSlice(fileInfo);
-            if(fileEntity == null){
-                return "error";
-            }
-        }
-
-        FileNode fileNode = UploadFileLogUtil.createFileNode(localFileInfo, folder, currentUser);
-        // 在数据库中储存新建文件信息并更新文件夹信息
-        fileNodeMapper.addNewFile(fileNode);
-
-        FileUtil.deleteSliceDir(localFileInfo);
         return "success";
     }
 
@@ -228,24 +232,9 @@ public class FileService {
 
     public boolean checkUploadFileSlice(HttpServletRequest request) {
         FileInfo fileInfo = RequestUtil.collectFileInfo(request);
-        String fileName = fileInfo.getCurrentChunk() + ".slice";
-        File folderByMD5 = FileUtil.getSliceDirByMD5(fileInfo.getMD5());
-        if(folderByMD5!=null){
-            // 验证INFO文件
-
-            // 验证分片
-            File sliceFile = new File(folderByMD5.getPath() + File.separator + fileName);
-            if(sliceFile.exists()){
-                try{
-                    String md5 = MD5Util.calMD5(sliceFile);
-                    return fileInfo.getCurrentChunkMD5().equals(md5);
-                }catch (IOException e){
-                    e.printStackTrace();
-                    return false;
-                }
-            }
-        }
-        return false;
+        // 验证INFO文件
+        // 验证分片
+        return FileUtil.checkFileInfo(fileInfo) && FileUtil.checkFileSlice(fileInfo);
     }
 
     public String deleteFile(HttpServletRequest request, int fileId) {

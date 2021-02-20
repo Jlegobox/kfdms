@@ -289,4 +289,25 @@ public class FileUtil {
     public static synchronized boolean deleteFile(File fileEntity) {
         return fileEntity.delete();
     }
+
+    public static boolean checkFileInfo(FileInfo fileInfo) {
+        File folderByMD5 = getSliceDirByMD5(fileInfo.getMD5());
+        File localFileInfoFile = new File(folderByMD5.getPath() + File.separator + fileInfo.getMD5() + ".INFO");
+        return localFileInfoFile.exists();
+    }
+
+    public static boolean checkFileSlice(FileInfo fileInfo){
+        File folderByMD5 = getSliceDirByMD5(fileInfo.getMD5());
+        File sliceFile = new File(folderByMD5.getPath() + File.separator + fileInfo.getCurrentChunk() + ".slice");
+        if(sliceFile.exists()){
+            try{
+                String md5 = MD5Util.calMD5(sliceFile);
+                return fileInfo.getCurrentChunkMD5().equals(md5);
+            }catch (IOException e){
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return false;
+    }
 }
