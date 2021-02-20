@@ -20,8 +20,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -151,8 +150,14 @@ public class DataCloudController {
     }
     // 下载文件
     @RequestMapping("/downloadFile.do")
-    public String downloadFile(final HttpServletRequest request, final HttpServletResponse response, @RequestParam("fileId") final String fileId){
-        return fileService.downloadFile(request,response,fileId);
+    public String downloadFile(final HttpServletRequest request, final HttpServletResponse response, @RequestParam("fileId") final int fileId){
+        String returnMSG = "error";
+        try {
+            returnMSG = fileService.downloadFile(request, response, fileId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return returnMSG;
     }
 
     // 上传前校验

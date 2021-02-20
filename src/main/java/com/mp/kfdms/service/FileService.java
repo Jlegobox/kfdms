@@ -54,16 +54,16 @@ public class FileService {
         MultipartFile upload_file = multiFileMap.getFirst("file");
         // 获得此次分片的fileInfo
         FileInfo fileInfo = RequestUtil.collectFileInfo(request);
-        FileUtil.saveSlice(upload_file,fileInfo);
+        FileUtil.saveSlice(upload_file, fileInfo);
 
         return "success";
     }
 
-    public String completeUploadFile(HttpServletRequest request, int folderId){
+    public String completeUploadFile(HttpServletRequest request, int folderId) {
         // 验证登录状态和上传权限
         User currentUser = UserUtil.getUserFromToken(request.getHeader("lg_token"));
         currentUser = userMapper.findOneByEmail(currentUser);
-        if(currentUser == null)
+        if (currentUser == null)
             return "authError";
 
         // 从request中获取MD5
@@ -76,20 +76,20 @@ public class FileService {
         Folder folder = new Folder();
         folder.setFolder_id(folderId);
         folder = folderMapper.getFolderById(folder.getFolder_id());
-        if(folder == null)
+        if (folder == null)
             return "error";
 
         // 根据文件的MD5获取上传文件的FileInfo对象
         FileInfo localFileInfo = null;
-        try{
+        try {
             localFileInfo = FileUtil.getFileInfo(fileInfo);
-            if(localFileInfo == null)
+            if (localFileInfo == null)
                 return "error";
             // 判断是否需要合并
             File fileEntity = FileUtil.getFileEntity(localFileInfo);
-            if(fileEntity == null){
+            if (fileEntity == null) {
                 fileEntity = FileUtil.mergeSlice(fileInfo);
-                if(fileEntity == null){
+                if (fileEntity == null) {
                     return "error";
                 }
             }
@@ -97,10 +97,10 @@ public class FileService {
             FileNode fileNode = UploadFileLogUtil.createFileNode(localFileInfo, folder, currentUser);
             // 在数据库中储存新建文件信息并更新文件夹信息
             fileNodeMapper.addNewFile(fileNode);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return "error";
-        }finally {
+        } finally {
             /**
              * 因为已经到了最后一步，因此不管最后合并是否成功，最后都需要清理文件夹
              * 为了防止因为INFO文件的问题导致的错误，因此从传入的fileInfo中获取MD5值
@@ -111,42 +111,61 @@ public class FileService {
         return "success";
     }
 
-    public String downloadFile(HttpServletRequest request, final HttpServletResponse response, String fileId) {
-        String fileName = "test.txt";
-        response.setCharacterEncoding("utf-8");
-        response.setContentType("multipart/form-data");
-        response.setHeader("Content-Disposition", "attachment;fileName="
-                + fileName);
-        try {
-            String path = "C:\\Users\\J\\GitHub\\kfdms\\APPDATA" + "\\" + fileName;
-            InputStream inputStream = new FileInputStream(new File(path));
+    public String downloadFile(HttpServletRequest request, final HttpServletResponse response, int fileId) throws IOException {
+        FileNode fileNode = null;
+        try{
+            fileNode = fileNodeMapper.getFileById(fileId);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "not exists";
+        }
 
-            OutputStream os = response.getOutputStream();
+        String fileName = fileNode.getFile_name();
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment;fileName=" + fileNode.getFile_md5() + ".block");
+        InputStream inputStream = null;
+        OutputStream os = null;
+        BufferedInputStream bufferedInputStream = null;
+        try {
+            String path = "C:\\Users\\J\\GitHub\\kfdms\\APPDATA\\" + fileNode.getFile_md5() + ".block";
+            File file = new File(path);
+            if(!file.exists())
+                return "not exists";
+            inputStream = new FileInputStream(file);
+            bufferedInputStream = new BufferedInputStream(inputStream);
+
+            os = response.getOutputStream();
             byte[] b = new byte[2048];
-            int length;
-            while ((length = inputStream.read(b)) > 0) {
+            int length=0;
+            while ((length = bufferedInputStream.read(b)) > 0) {
                 os.write(b, 0, length);
             }
-
-            // 这里主要关闭。
-            os.close();
-
-            inputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } finally {
+            // 这里主要关闭。
+            if(os!=null){
+                os.flush();
+                os.close();
+            }
+            if(bufferedInputStream!=null){
+                bufferedInputStream.close();
+            }
+            if(inputStream!=null){
+                inputStream.close();
+            }
         }
         return "success";
     }
 
-    public List<FileNode> listFiles(final HttpServletRequest request, final Folder currentFolder){
+    public List<FileNode> listFiles(final HttpServletRequest request, final Folder currentFolder) {
         FileNode fileNode = new FileNode();
         fileNode.setFile_folder_id(currentFolder.getFolder_id());
         return fileNodeMapper.getFileByFileFolderId(fileNode.getFile_folder_id());
     }
 
-    public String listFiles(final HttpServletRequest request, final int folderId){
+    public String listFiles(final HttpServletRequest request, final int folderId) {
         String returnMsg = "error";
         FileNode fileNode = new FileNode();
         fileNode.setFile_folder_id(folderId);
@@ -155,12 +174,13 @@ public class FileService {
         return returnMsg;
     }
 
-    public String checkFilePermission(User currentUser,FileNode fileNode){
+    public String checkFilePermission(User currentUser, FileNode fileNode) {
         return "success";
     }
 
     /**
      * 文件上传前校验，包括上传权限,文件名和文件是否已上传
+     *
      * @param request
      * @param folderId
      * @return
@@ -174,45 +194,45 @@ public class FileService {
 
         // 校验上传权限
         boolean uploadAuth = userService.checkUploadAuth(user);
-        if(!uploadAuth)
+        if (!uploadAuth)
             return "authError";
 
         //校验重名
         List<FileNode> files = fileNodeMapper.getFileByFileFolderId(folderId);
         String uploadFilename = fileInfo.getOriginFileName();
-        boolean renameFlag=false;
+        boolean renameFlag = false;
         for (FileNode file : files) {
-            if(file.getFile_name().equals(uploadFilename)){
-                renameFlag=true;
+            if (file.getFile_name().equals(uploadFilename)) {
+                renameFlag = true;
                 break;
             }
         }
-        if(renameFlag){
+        if (renameFlag) {
             String renameFileStrategy = ConfigurationReader.instance().getConf("renameFileStrategy");
-            if(renameFileStrategy != null && !"true".equals(renameFileStrategy)) { // 自动重命名
-                String new_fileName="new upload file";
+            if (renameFileStrategy != null && !"true".equals(renameFileStrategy)) { // 自动重命名
+                String new_fileName = "new upload file";
                 try {
                     new_fileName = FileUtil.renameFileByStrategy(renameFileStrategy, files, fileInfo);
-                }catch (Exception e){
+                } catch (Exception e) {
                     return "rename error";
                 }
                 request.setAttribute("new_fileName", new_fileName);
-            }else { //未开启自动重命名,返回提示
+            } else { //未开启自动重命名,返回提示
                 return "duplicateFileName";
             }
         }
 
         // 校验MD5,秒传功能
         List<FileNode> fileByMD5 = fileNodeMapper.getFileByMD5(fileInfo.getMD5());
-        if(fileByMD5 != null && fileByMD5.size()>0){
+        if (fileByMD5 != null && fileByMD5.size() > 0) {
             // 保存文件
             boolean saved = quickSave(fileInfo, user, folderId);
-            return saved?"exists":"permit";
+            return saved ? "exists" : "permit";
         }
         return "permit";
     }
 
-    public boolean quickSave(FileInfo fileInfo, User user, int folderId){
+    public boolean quickSave(FileInfo fileInfo, User user, int folderId) {
         // 秒传功能，直接进行数据库数据的更新
         // 更新失败，则按照正常流程重新上传
         // 创建文件夹
@@ -240,10 +260,10 @@ public class FileService {
     public String deleteFile(HttpServletRequest request, int fileId) {
         User user = UserUtil.getUserFromToken(request.getHeader("lg_token"));
         boolean auth = userService.checkDeleteAuth();
-        if(auth){
+        if (auth) {
             FileNode deleteFile = fileNodeMapper.getFileById(fileId);
             int count = fileNodeMapper.deleteFileById(fileId);
-            if(count>=1){
+            if (count >= 1) {
                 cleanFileEntity(deleteFile.getFile_md5());
                 return "success";
             }
@@ -254,12 +274,13 @@ public class FileService {
 
     /**
      * 清除服务器的上传文件实体，删除了实体的话返回false
+     *
      * @param fileMD5
      * @return
      */
-    public boolean cleanFileEntity(String fileMD5){
+    public boolean cleanFileEntity(String fileMD5) {
         List<FileNode> fileByMD5 = fileNodeMapper.getFileByMD5(fileMD5);
-        if(fileByMD5.size() == 0){
+        if (fileByMD5.size() == 0) {
             FileInfo fileInfo = new FileInfo();
             fileInfo.setMD5(fileMD5);
             File fileEntity = FileUtil.getFileEntity(fileInfo);

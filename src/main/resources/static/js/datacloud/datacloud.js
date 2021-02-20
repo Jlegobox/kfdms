@@ -358,6 +358,7 @@ function createOperationBtn(fileOperation,elemParam){
     var downloadBtn = document.createElement('button');
     downloadBtn.innerHTML = "下载"
     downloadBtn.setAttribute("class","layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
+    downloadBtn.setAttribute("onclick","downloadFile("+elemParam.fileId+")")
 
     var editBtn = document.createElement('button');
     editBtn.innerHTML = "编辑"
@@ -375,6 +376,7 @@ function createOperationBtn(fileOperation,elemParam){
     // 权限校验
     if(elemParam.isFolder){
         previewBtn.setAttribute("class",disable);
+        downloadBtn.setAttribute("class",disable);
     }
 
     // 添加按钮
@@ -407,12 +409,13 @@ function delFile(fileId,isFolder){
                 }
                 case "sucess":{
                     if(isFolder)
-                        alert("文件夹已删除")
+                        alert("文件夹已删除");
                     else
-                        alert("文件已被删除")
+                        alert("文件已被删除");
+                    break;
                 }
                 case "error":{
-                    alert("删除失败")
+                    alert("删除失败");
                 }
             }
 
@@ -429,8 +432,38 @@ function delFile(fileId,isFolder){
 
 }
 
-function del_file(){
-
+function downloadFile(fileId){
+    window.open("DataCloud/downloadFile.do?fileId=" + fileId)
+    // $.ajax({
+    //     url:"DataCloud/downloadFile.do",
+    //     type:"POST",
+    //     data:{
+    //         fileId:fileId
+    //     },
+    //     beforeSend:function (xhr){
+    //         xhr.setRequestHeader("lg_token",sessionStorage["lg_token"])
+    //     },
+    //     success:function (result){
+    //         switch (result){
+    //             case "not exists":{
+    //                 alert("服务器文件破损，请联系管理员");
+    //                 break;
+    //             }
+    //             case "sucess":{
+    //                 break;
+    //             }
+    //             case "error":{
+    //                 alert("下载失败")
+    //             }
+    //         }
+    //
+    //     },
+    //     error:function (result){
+    //         alert("sever error!");
+    //         sessionStorage.clear();
+    //         top.location="login.html";
+    //     }
+    // })
 }
 
 function createFolder(){
