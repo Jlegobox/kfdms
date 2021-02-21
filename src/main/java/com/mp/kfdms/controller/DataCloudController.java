@@ -60,10 +60,23 @@ public class DataCloudController {
 
     // 新建文件夹
     @RequestMapping(value = {"/createFolder.ajax"})
-    public String createFolder(final HttpServletRequest request, final HttpServletResponse response){
+    public String createFolder(final HttpServletRequest request){
         String returnMsg = "error";
         returnMsg = folderService.createFolder(request);
         return returnMsg;
+    }
+
+    @RequestMapping("getFolderInfo.ajax")
+    public String getFolderInfo(final HttpServletRequest request,final int folderId){
+        User currentUser = UserUtil.getUserFromToken(request.getHeader("lg_token"));
+        Folder currentFolder = folderService.getCurrentFolder(currentUser, folderId);
+        return GsonUtil.instance().toJson(currentFolder);
+    }
+
+    @RequestMapping("modifyFolder.ajax")
+    public String modifyFolder(final HttpServletRequest request, final int folderId){
+        folderService.modifyFolder(request,folderId);
+        return "success";
     }
 
     /**

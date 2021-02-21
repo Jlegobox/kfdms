@@ -2,15 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mp.kfdms.mapper.FolderMapper">
     <resultMap id="FolderResultMap" type="com.mp.kfdms.domain.Folder">
-        <result column="folder_id" jdbcType="INTEGER" property="folder_id" />
-        <result column="folder_name" jdbcType="VARCHAR" property="folder_name" />
+        <result column="folder_id" jdbcType="INTEGER" property="folder_id"/>
+        <result column="folder_name" jdbcType="VARCHAR" property="folder_name"/>
         <result column="folder_parent_id" jdbcType="INTEGER" property="folder_parent_id"/>
-        <result column="folder_owner_id" jdbcType="INTEGER" property="folder_owner_id" />
+        <result column="folder_owner_id" jdbcType="INTEGER" property="folder_owner_id"/>
         <result column="folder_owner_name" jdbcType="INTEGER" property="folder_owner_name"/>
         <result column="folder_type" jdbcType="INTEGER" property="folder_type"/>
-        <result column="is_private" jdbcType="INTEGER" property="is_private" />
-        <result column="folder_size" jdbcType="INTEGER" property="folder_size" />
-        <result column="folder_max_size" jdbcType="INTEGER" property="folder_max_size" />
+        <result column="is_private" jdbcType="INTEGER" property="is_private"/>
+        <result column="folder_size" jdbcType="INTEGER" property="folder_size"/>
+        <result column="folder_max_size" jdbcType="INTEGER" property="folder_max_size"/>
         <result column="folder_description" jdbcType="VARCHAR" property="folder_description"/>
         <result column="folder_create_time" jdbcType="TIME" property="folder_create_time"/>
         <result column="folder_modified_time" jdbcType="TIME" property="folder_modified_time"/>
@@ -33,7 +33,8 @@
     <select id="getBaseFolderByUser" parameterType="com.mp.kfdms.domain.User" resultType="com.mp.kfdms.domain.Folder">
         select * from folder where folder_parent_id=0 and folder_owner_id=#{id} limit 1;
     </select>
-    <select id="getParentFolderByFolderParentId" parameterType="java.lang.Integer" resultType="com.mp.kfdms.domain.Folder">
+    <select id="getParentFolderByFolderParentId" parameterType="java.lang.Integer"
+            resultType="com.mp.kfdms.domain.Folder">
         select * from folder where folder_id=#{folder_parent_id} limit 1
     </select>
     <select id="countFolder" parameterType="com.mp.kfdms.domain.Folder" resultType="java.lang.Integer">
@@ -42,4 +43,9 @@
     <delete id="deleteFolderById" parameterType="java.lang.Integer">
         delete from folder where  folder_id = #{folderId}
     </delete>
+    <update id="updateFolder" parameterType="com.mp.kfdms.domain.Folder">
+        update folder set folder_name = #{folder_name},folder_parent_id = #{folder_parent_id},folder_owner_id = #{folder_owner_id},
+        folder_type = #{folder_type},is_private = #{is_private},folder_size = #{folder_size},folder_max_size = #{folder_max_size},
+        folder_description = #{folder_description} where folder_id = #{folder_id}
+    </update>
 </mapper>

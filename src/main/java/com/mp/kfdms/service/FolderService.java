@@ -45,22 +45,20 @@ public class FolderService {
         User oneByEmail = userMapper.findOneByEmail(login_info);
 
         Folder folder = new Folder();
-        folder.setFolder_id(RequestUtil.getInt(request, "folder_id"));
-        folder.setFolder_name(RequestUtil.getStr(request,"folder_name"));
-        int folder_parent_id = Integer.parseInt(request.getParameter("folderId")) ;
-        if(folder_parent_id==0)// 在底层文件夹
-            folder_parent_id=oneByEmail.getBase_folder_id();
+        folder.setFolder_id(RequestUtil.getInt(request, "folderId"));
+        folder.setFolder_name(RequestUtil.getStr(request,"folderName"));
+        int folder_parent_id = RequestUtil.getInt(request, "parentFolderId");
         folder.setFolder_parent_id(folder_parent_id);
 
 
         folder.setFolder_owner_id(oneByEmail.getId());
         folder.setFolder_owner_name(oneByEmail.getUsername());
 
-        folder.setFolder_type(RequestUtil.getInt(request,"folder_type"));
-        folder.setIs_private(RequestUtil.getInt(request,"is_private"));
-        folder.setFolder_size(RequestUtil.getInt(request,"folder_size"));
-        folder.setFolder_max_size(RequestUtil.getInt(request,"folder_max_size"));
-        folder.setFolder_description(RequestUtil.getStr(request,"description"));
+        folder.setFolder_type(RequestUtil.getInt(request,"folderType"));
+        folder.setIs_private(RequestUtil.getInt(request,"isPrivate"));
+        folder.setFolder_size(RequestUtil.getInt(request,"folderSize"));
+        folder.setFolder_max_size(RequestUtil.getInt(request,"folderMaxSize"));
+        folder.setFolder_description(RequestUtil.getStr(request,"folderDescription"));
         return folder;
     }
 
@@ -109,11 +107,11 @@ public class FolderService {
     }
 
     public Folder getCurrentFolder(User currentUser, int folderId) {
-        Folder currentFolder = new Folder();
-        currentFolder.setFolder_id(folderId);
-        currentFolder = folderMapper.getFolderById(currentFolder.getFolder_id());
-        if(currentFolder == null){ // 找不到文件
-            currentFolder = getBaseFolderByUser(currentUser);
+        Folder currentFolder = null; // 出错则直接返回null
+        try{
+            currentFolder = folderMapper.getFolderById(folderId);
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return currentFolder;
     }
@@ -159,5 +157,22 @@ public class FolderService {
                 return "success";
         }
         return "error";
+    }
+
+    public String modifyFolder(HttpServletRequest request, int folderId) {
+        Folder folder = wrapFolder(request);
+        try{
+            Folder folderById = folderMapper.getFolderById(folderId);
+            folderById.setFolder_name(folder.getFolder_name());
+            folderById.setFolder_type(folder.getFolder_type());
+            folderById.setFolder_description(folder.getFolder_description());
+            int i = folderMapper.updateFolder(folderById);
+            if(i<1)
+                return "error";
+        }catch (Exception e){
+            e.printStackTrace();
+            return "error";
+        }
+        return "success";
     }
 }

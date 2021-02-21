@@ -20,6 +20,7 @@ import java.io.RandomAccessFile;
 public class RangeFileStreamWriter {
     private static final long DOWNLOAD_CACHE_MAX_AGE = 1800L;
 
+
     /**
      *
      * <h2>使用断点续传技术提供输出流</h2>
@@ -27,7 +28,7 @@ public class RangeFileStreamWriter {
      * 处理普通的或带有断点续传参数的下载请求，并按照请求方式提供相应的输出流写出。请传入相应的参数并执行该方法以开始传输。
      * </p>
      *
-     * @author 青阳龙野(kohgylw)
+     *
      * @param request
      *            javax.servlet.http.HttpServletRequest 请求对象
      * @param response

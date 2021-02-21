@@ -30,4 +30,6 @@ public interface FolderMapper {
     public int countFolder(Folder currentFolder);
 
     public int deleteFolderById(int folderId);
+
+    public int updateFolder(Folder folder);
 }
