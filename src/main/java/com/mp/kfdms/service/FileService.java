@@ -119,42 +119,12 @@ public class FileService {
             e.printStackTrace();
             return "not exists";
         }
-
-        String fileName = fileNode.getFile_name();
-        response.setCharacterEncoding("utf-8");
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment;fileName=" + fileNode.getFile_md5() + ".block");
-        InputStream inputStream = null;
-        OutputStream os = null;
-        BufferedInputStream bufferedInputStream = null;
-        try {
-            String path = "C:\\Users\\J\\GitHub\\kfdms\\APPDATA\\" + fileNode.getFile_md5() + ".block";
-            File file = new File(path);
-            if(!file.exists())
-                return "not exists";
-            inputStream = new FileInputStream(file);
-            bufferedInputStream = new BufferedInputStream(inputStream);
-
-            os = response.getOutputStream();
-            byte[] b = new byte[2048];
-            int length=0;
-            while ((length = bufferedInputStream.read(b)) > 0) {
-                os.write(b, 0, length);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            // 这里主要关闭。
-            if(os!=null){
-                os.flush();
-                os.close();
-            }
-            if(bufferedInputStream!=null){
-                bufferedInputStream.close();
-            }
-            if(inputStream!=null){
-                inputStream.close();
-            }
+        File fileEntity = FileUtil.getFileFromEntity(fileNode);
+        if(fileEntity!=null){
+            String fileName = fileNode.getFile_name();
+            // TODO: 2021/2/21 需要暴露速度设置
+            int status = RangeFileStreamWriter.writeRangeFileStream(request, response, fileEntity, fileName,
+                    "application/octet-stream", 1024, "aabbcc", true);
         }
         return "success";
     }

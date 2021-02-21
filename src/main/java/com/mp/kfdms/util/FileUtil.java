@@ -310,4 +310,12 @@ public class FileUtil {
         }
         return false;
     }
+
+    public static File getFileFromEntity(FileNode fileNode) {
+        File fileEntity = new File(BASE_URL + File.separator + fileNode.getFile_md5() + ".block");
+        if(fileEntity.exists()){
+            return fileEntity;
+        }
+        return null;
+    }
 }
