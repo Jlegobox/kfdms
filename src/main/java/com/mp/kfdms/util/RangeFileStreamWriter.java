@@ -97,8 +97,8 @@ public class RangeFileStreamWriter {
         response.setCharacterEncoding("UTF-8");
         // 设置Content-Disposition信息
         if (isAttachment) {
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName
-                    + "\"; filename*=utf-8''" + fileName);
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + EncodeUtil.getFileNameByUTF8(fileName)
+                    + "\"; filename*=utf-8''" + EncodeUtil.getFileNameByUTF8(fileName));
         } else {
             response.setHeader("Content-Disposition", "inline");
         }
