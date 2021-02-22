@@ -501,6 +501,29 @@ function modifyFolder(folderId) {
     })
 }
 
+function modifyFile(fileId) {
+    var data = $('#fileInfo').serialize() + '&fileDescription=' + $('#fileDescription').val()
+        + '&fileId='+fileId;
+    $.ajax({
+        url: "DataCloud/modifyFile.ajax",
+        type: 'POST',
+        data: data,
+        async: false,
+        dataType: 'text',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
+        },
+        success: function (result) {
+        },
+        error: function (result) {
+        },
+        complete: function (xhr, data) {
+            datacloud_close_refresh()
+        }
+
+    })
+}
+
 function openFolderEditPage(folderId) {
     $.ajax({
         url: "DataCloud/getFolderInfo.ajax",
@@ -527,7 +550,28 @@ function openFolderEditPage(folderId) {
 }
 
 function openFileEditPage(fileId) {
-    x_admin_show('编辑文件属性', './fileInfo.html', 600, 400)
+    $.ajax({
+        url: "DataCloud/getFileInfo.ajax",
+        type: 'POST',
+        data: {
+            "fileId": fileId
+        },
+        async: false,
+        dataType: 'text',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
+        },
+        success: function (result) {
+            sessionStorage["fileInfo"] = result
+            x_admin_show('编辑文件属性', './fileInfo.html', 600, 400)
+        },
+        error: function (result) {
+            alert("error")
+        },
+        complete: function (xhr, data) {
+            datacloud_close_refresh()
+        }
+    })
 }
 
 

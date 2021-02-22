@@ -55,4 +55,6 @@ public interface FileNodeMapper {
     public int deleteFileById(int fileId);
 
     public FileNode getFileById(int fileId);
+
+    public int updateFileNode(FileNode fileNode);
 }

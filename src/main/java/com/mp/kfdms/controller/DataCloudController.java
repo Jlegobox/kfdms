@@ -79,6 +79,19 @@ public class DataCloudController {
         return "success";
     }
 
+    @RequestMapping("getFileInfo.ajax")
+    public String getFileInfo(final HttpServletRequest request,final int fileId){
+
+        FileNode fileNode = fileService.getFileInfo(request,fileId);
+        return GsonUtil.instance().toJson(fileNode);
+    }
+
+    @RequestMapping("modifyFile.ajax")
+    public String modifyFile(final HttpServletRequest request, final int fileId){
+        fileService.modifyFile(request, fileId);
+        return "success";
+    }
+
     /**
      * 删除文件or文件夹
      * @param request

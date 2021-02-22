@@ -258,4 +258,41 @@ public class FileService {
         }
         return false;
     }
+
+    public FileNode getFileInfo(HttpServletRequest request,int fileId) {
+        User currentUser = UserUtil.getUserFromToken(request.getHeader("lg_token"));
+        FileNode fileNode =null;
+        try{
+            fileNode = fileNodeMapper.getFileById(fileId);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return fileNode;
+    }
+
+    /**
+     * 修改文件属性
+     * 目前只能修改名称
+     * @param request
+     * @param fileId
+     * @return
+     */
+    public String modifyFile(HttpServletRequest request, int fileId){
+        User currentUser = UserUtil.getUserFromToken(request.getHeader("lg_token"));
+        boolean modifyAuth = userService.checkModifyAuth(currentUser);
+        try{
+            FileNode fileById = fileNodeMapper.getFileById(fileId);
+            fileById.setFile_name(request.getParameter("fileName"));
+            fileById.setFile_type(Integer.parseInt(request.getParameter("fileType")));
+            fileById.setFile_description(request.getParameter("fileDescription"));
+            fileNodeMapper.updateFileNode(fileById);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "error";
+        }
+        return "success";
+    }
+
+
 }

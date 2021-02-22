@@ -23,4 +23,9 @@
     <select id="getFileByMD5" parameterType="java.lang.String" resultType="com.mp.kfdms.domain.FileNode">
         select * from filenode where file_md5 = #{MD5};
     </select>
+    <update id="updateFileNode" parameterType="com.mp.kfdms.domain.FileNode">
+        update filenode set file_encode_name=#{file_encode_name},file_name=#{file_name},file_folder_id=#{file_folder_id},file_owner_id=#{file_owner_id},
+        file_type=#{file_type},data_type=#{data_type}, file_description=#{file_description},file_size=#{file_size},file_md5=#{file_md5},
+        file_permission=#{file_permission} where file_id = #{file_id}
+    </update>
 </mapper>

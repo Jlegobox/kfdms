@@ -165,4 +165,8 @@ public class UserService {
     public boolean checkDeleteAuth() {
         return true;
     }
+
+    public boolean checkModifyAuth(User user){
+        return true;
+    }
 }

@@ -27,6 +27,8 @@ import java.util.Map;
  */
 @Service
 public class FolderService {
+    private static String SERVER_ERROR = "error"; //
+    private static String SUCESS="sucess";
     @Resource
     private UserMapper userMapper;
 
