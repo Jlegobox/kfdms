@@ -75,8 +75,8 @@ function refreshTime() {
     var second = currentDate.getSeconds();
     var tmpMonth = month;
     var week = ['日', '一', '二', '三', '四', '五', '六'];
-    var timeContext = "<a>云盘同步时间：" + year + "/" + month + "/" + day + " 星期" + week[currentDate.getDay()] + " " + hour + ":" + minute + ":" + second + " </a>";
-    synTime.innerHTML = timeContext;
+    var timeContext = "云盘同步时间：" + year + "/" + month + "/" + day + " 星期" + week[currentDate.getDay()] + " " + hour + ":" + minute + ":" + second;
+    synTime.innerText = timeContext;
 }
 
 // 请求导航栏数据
@@ -214,6 +214,8 @@ function refreshFolder(folderId, pageParam) {
                     deskFolderId = folderId;
                     sessionStorage["deskFolderId"] = deskFolderId;
                     result = JSON.parse(result);
+                    // 清空
+                    $("#file_desk_tbody").html("");
                     loadFolderData(result);
                     loadTotalCount(result.pageParam);
                     deskFolderId = folderId;
@@ -237,7 +239,6 @@ function loadFolderData(folderView) {
     var files = folderView.files;
     var foldersPermission = folderView.foldersPermission;
     var filesPermission = folderView.filesPermission;
-    $("#file_desk_tbody").html("");
     displayFoldersElem(folders, foldersPermission);
     displayFilesElem(files, filesPermission);
 }
@@ -310,10 +311,12 @@ function getElemRow(elemParam) {
     //  以下是另一种添加html的方式
     var fileName = document.createElement('td'); //名称 加粗 移动变色并添加下划线
     var fileNameLink = document.createElement('a');//点击进入文件夹
-    fileNameLink.innerHTML = elemParam.fileName;
+    fileNameLink.innerText = elemParam.fileName;
     if (elemParam.isFolder) {
         fileNameLink.innerHTML = "<b>" + elemParam.fileName + "</b>";
         fileNameLink.setAttribute("href", "javascript:refreshFileDesk(\"" + elemParam.fileId + "\");")
+    }else {
+        fileNameLink.setAttribute("style","color:black")
     }
 
     fileName.appendChild(fileNameLink);
@@ -365,39 +368,65 @@ function getElemRow(elemParam) {
 }
 
 function createOperationBtn(fileOperation, elemParam) {
-    var disable = "layui-btn layui-btn-sm layui-btn-radius layui-btn-disabled"
+    let disable = "layui-btn layui-btn-sm layui-btn-disabled"
+    let btnGroup = document.createElement("div");
+    btnGroup.setAttribute("class", "layui-btn-group")
     // 根据权限
-    var downloadBtn = document.createElement('button');
-    downloadBtn.innerHTML = "下载"
+    // 下载按钮
+    let downloadBtn = document.createElement('button');
+    downloadBtn.innerText = "下载"
     downloadBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
     downloadBtn.setAttribute("onclick", "downloadFile(" + elemParam.fileId + ")")
+    // 分享按钮
+    let shareBtn = document.createElement('button');
+    shareBtn.innerText = "分享"
+    shareBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
+    shareBtn.setAttribute("onclick", "shareFile(" + elemParam.fileId + ")")
 
-    var editBtn = document.createElement('button');
-    editBtn.innerHTML = "编辑"
-    editBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
-    editBtn.setAttribute("onclick", "openFileEditPage(" + elemParam.fileId + ")")
+    // 更多操作按钮
+    let moreBtnGroup = document.createElement("div")
+    moreBtnGroup.setAttribute("class", "btn-group")
+    moreBtnGroup.innerHTML = '<button type="button" class="layui-btn layui-btn-normal" data-toggle="dropdown">更多</button>'
 
-    var previewBtn = document.createElement('button');
-    previewBtn.innerHTML = "预览"
-    previewBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
+    let moreBtnMenu = document.createElement('ul');
+    moreBtnMenu.setAttribute("class", "dropdown-menu");
+    moreBtnMenu.setAttribute("role", "menu");
 
-    var deleteBtn = document.createElement('button');
-    deleteBtn.innerHTML = "删除"
-    deleteBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-danger")
-    deleteBtn.setAttribute("onclick", "delFile(" + elemParam.fileId + "," + elemParam.isFolder + ")")
+    let editBtn = document.createElement("li")
+    editBtn.innerHTML = '<a href="javascript:openFileEditPage(' + elemParam.fileId + ')" onclick="">编辑</a>'
+
+    let previewBtn = document.createElement("li")
+    previewBtn.innerHTML = '<a href="javascript:alert('+"\'敬请期待\'"+')">预览</a>'
+
+    let deleteBtn = document.createElement("li")
+    deleteBtn.innerHTML = '<a href="javascript:delFile(' + elemParam.fileId + "," + elemParam.isFolder + ')">删除</a>'
 
     // 权限校验
     if (elemParam.isFolder) {
-        previewBtn.setAttribute("class", disable);
         downloadBtn.setAttribute("class", disable);
-        editBtn.setAttribute("onclick", "openFolderEditPage(" + elemParam.fileId + ")")
+        editBtn.innerHTML = '<a href="javascript:openFolderEditPage(' + elemParam.fileId + ')" onclick="">编辑</a>'
+        previewBtn.setAttribute("class", "disabled");
     }
 
+    // 下拉按钮组装
+    moreBtnGroup.appendChild(moreBtnMenu);
+    moreBtnMenu.appendChild(editBtn);
+    moreBtnMenu.appendChild(previewBtn)
+    moreBtnMenu.appendChild(deleteBtn)
+
+    // 按钮组组装
+    btnGroup.appendChild(downloadBtn)
+    btnGroup.appendChild(shareBtn)
+    btnGroup.appendChild(moreBtnGroup)
+
+    fileOperation.appendChild(btnGroup)
+
+
     // 添加按钮
-    fileOperation.appendChild(downloadBtn)
-    fileOperation.appendChild(editBtn)
-    fileOperation.appendChild(previewBtn)
-    fileOperation.appendChild(deleteBtn)
+    // fileOperation.appendChild(downloadBtn)
+    // fileOperation.appendChild(editBtn)
+    // fileOperation.appendChild(previewBtn)
+    // fileOperation.appendChild(deleteBtn)
 }
 
 /**
@@ -480,7 +509,7 @@ function createFolder() {
 
 function modifyFolder(folderId) {
     var data = $('#folderInfo').serialize() + '&folderDescription=' + $('#folderDescription').val()
-        + '&folderId='+folderId;
+        + '&folderId=' + folderId;
     $.ajax({
         url: "DataCloud/modifyFolder.ajax",
         type: 'POST',
@@ -503,7 +532,7 @@ function modifyFolder(folderId) {
 
 function modifyFile(fileId) {
     var data = $('#fileInfo').serialize() + '&fileDescription=' + $('#fileDescription').val()
-        + '&fileId='+fileId;
+        + '&fileId=' + fileId;
     $.ajax({
         url: "DataCloud/modifyFile.ajax",
         type: 'POST',

@@ -16,6 +16,10 @@
       <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
       <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <!--boostrap-->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
     <script src="js/datacloud/datacloud.js"></script>
   </head>
 
@@ -34,14 +38,14 @@
 
     </div>
     <div class="x-body">
-      <div class="layui-row">
-        <form class="layui-form layui-col-md12 x-so">
-          <input class="layui-input"  autocomplete="off" placeholder="开始日" name="start" id="start">
-          <input class="layui-input"  autocomplete="off" placeholder="截止日" name="end" id="end">
-          <input type="text" name="username"  placeholder="请输入用户名" autocomplete="off" class="layui-input">
-          <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
-        </form>
-      </div>
+<!--      <div class="layui-row">-->
+<!--        <form class="layui-form layui-col-md12 x-so">-->
+<!--          <input class="layui-input"  autocomplete="off" placeholder="开始日" name="start" id="start">-->
+<!--          <input class="layui-input"  autocomplete="off" placeholder="截止日" name="end" id="end">-->
+<!--          <input type="text" name="username"  placeholder="请输入用户名" autocomplete="off" class="layui-input">-->
+<!--          <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>-->
+<!--        </form>-->
+<!--      </div>-->
       <xblock>
         <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
         <button class="layui-btn layui-btn-danger" id="uploadMultiFile"><i class="layui-icon layui-icon-upload-circle"></i>批量上传</button>
@@ -76,10 +80,22 @@
             <td class="td-status">
               <span class="layui-btn layui-btn-normal layui-btn-mini">已启用</span></td>
             <td class="td-manage">
-              <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal">下载</button>
-              <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal">编辑</button>
-              <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-disabled">预览</button>
-              <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-danger">删除</button>
+              <div class="layui-btn-group">
+                <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal">下载</button>
+                <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal">分享</button>
+                <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-disabled">预览</button>
+                <div class="btn-group">
+                  <button type="button" class="layui-btn layui-btn-normal" data-toggle="dropdown">更多
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a onclick="alert('功能')">功能</a></li>
+                    <li><a href="#">另一个功能</a></li>
+                    <li><a href="#">其他</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">分离的链接</a></li>
+                  </ul>
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -93,7 +109,7 @@
         <button class="layui-btn layui-btn-primary">跳转</button><label></label>
         <button class="layui-btn layui-btn-primary" onclick="nextPage()">&gt;</button>
         <label id="totalPage">共 10 页</label>
-        <select id="pageSizeSelect" class="layui-btn layui-btn-primary" style="width: 100px">
+        <select id="pageSizeSelect" class="layui-btn layui-btn-primary" style="width: 80px">
           <option value="10" selected onclick="changePageParam()">10 条/页</option>
           <option value="20" onclick="changePageParam()">20 条/页</option>
         </select>
@@ -179,5 +195,4 @@
     })();</script>
 
   </body>
-
 </html>
