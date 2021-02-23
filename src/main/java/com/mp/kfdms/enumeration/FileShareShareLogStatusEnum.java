@@ -6,7 +6,7 @@ package com.mp.kfdms.enumeration;
  * @Date 2021/2/22
  * @Time 23:50
  */
-public enum ShareLogStatusEnum {
+public enum FileShareShareLogStatusEnum {
     CREATE_FAIL, // 创建失败
     SHARING, // 分享中
     EXPIRED, // 过期链接（因为时间到期或者访问次数到期）

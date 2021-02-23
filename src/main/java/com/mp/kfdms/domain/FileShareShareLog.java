@@ -22,6 +22,7 @@ public class FileShareShareLog {
     private Date expiredTime;
     private Date deleteTime; // 手动取销或过期后选择不展示的日期
     private int status;
+    private int version;
 
     public int getShareLogId() {
         return shareLogId;
@@ -117,5 +118,32 @@ public class FileShareShareLog {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    @Override
+    public String toString() {
+        return "FileShareShareLog{" +
+                "shareLogId=" + shareLogId +
+                ", userId=" + userId +
+                ", fileId=" + fileId +
+                ", folderId=" + folderId +
+                ", accessCode='" + accessCode + '\'' +
+                ", visitNum=" + visitNum +
+                ", visitLimit=" + visitLimit +
+                ", validPeriod=" + validPeriod +
+                ", createTime=" + createTime +
+                ", expiredTime=" + expiredTime +
+                ", deleteTime=" + deleteTime +
+                ", status=" + status +
+                ", version=" + version +
+                '}';
     }
 }

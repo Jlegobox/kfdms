@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.kfdms.mapper.FileShareMapper">
+    <insert id="addShareLog" parameterType="com.mp.kfdms.domain.FileShareShareLog">
+        insert into fileshare_sharelog(user_id, file_id, folder_id, access_code, visit_num, visit_limit,
+        valid_period, create_time, expired_time, delete_time,status) values (
+        #{userId},#{fileId},#{folderId},#{accessCode},#{visitNum},#{visitLimit},
+        #{validPeriod},#{createTime},#{expiredTime},#{deleteTime},#{status}
+        )
+    </insert>
+    <select id="getShareLogById" parameterType="java.lang.Integer">
+        select * from fileshare_sharelog where sharelog_id = #{logId}
+    </select>
+    <update id="updateShareLog" parameterType="com.mp.kfdms.domain.FileShareShareLog">
+        update fileshare_sharelog set visit_num = #{visitNum},delete_time = #{deleteTime}, status = #{status}, version = version +1
+        where sharelog_id = #{shareLogId} and version = #{version}
+    </update>
+</mapper>

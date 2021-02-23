@@ -1,6 +1,7 @@
 package com.mp.kfdms.util;
 
 import com.mp.kfdms.domain.User;
+import com.mp.kfdms.pojo.FileShareLinkInfo;
 import com.mp.kfdms.pojo.LoginInfo;
 
 /**
@@ -38,5 +39,9 @@ public class UserUtil {
         user.setEmail(loginInfo.getEmail());
         user.setPassword(loginInfo.getPassword());
         return user;
+    }
+
+    public static boolean checkFileShareAuth(User currentUser, FileShareLinkInfo fileShareLinkInfo) {
+        return true;
     }
 }

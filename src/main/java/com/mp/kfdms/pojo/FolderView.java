@@ -12,11 +12,13 @@ import java.util.ArrayList;
  * @Time 22:42
  */
 public class FolderView {
-    private ArrayList<Folder> folders;
-    private ArrayList<FileNode> files;
-    private ArrayList<String> foldersPermission;
-    private ArrayList<String> filesPermission;
-    private PageParam pageParam;
+    private ArrayList<Folder> folders = new ArrayList<>();
+    private ArrayList<FileNode> files = new ArrayList<>();
+    // TODO: 2021/2/23  更换为FilePermission 进行权限验证
+    private ArrayList<String> foldersPermission = new ArrayList<>();
+    private ArrayList<String> filesPermission = new ArrayList<>();
+
+    private PageParam pageParam = new PageParam();
 
     public PageParam getPageParam() {
         return pageParam;
