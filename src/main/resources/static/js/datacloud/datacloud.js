@@ -8,10 +8,11 @@ var pageParam = {
 }
 
 // 加载页面时操作
-$(
-    getBaseFolderId(),
+function initFileDesk(){
+    getBaseFolderId()
     refreshFileDesk(deskFolderId)
-)
+}
+
 
 function getBaseFolderId() {
     if (deskFolderId !== 0) {
