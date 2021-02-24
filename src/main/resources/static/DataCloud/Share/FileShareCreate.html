@@ -23,33 +23,39 @@
 <body>
 
 <div class="x-body">
-    <form id="fileShareLinkInfo" class="layui-form">
-        <div class="layui-form-item layui-bg-gray" style="height:40px;font-size: 18px">
-            <div class="layui-form-text" style="padding: 10px">
-                <span>分享文件：</span>
-                <span id="shareFileName">出错</span>
-            </div>
-        </div>
+    <form id="fileShareLinkInfo" class="layui-form" style="display: block">
+<!--        <div class="layui-form-item layui-bg-gray" style="height:40px;font-size: 18px">-->
+<!--            <div class="layui-form-text" style="padding: 10px">-->
+<!--                <span>分享文件：</span>-->
+<!--                <span id="shareFileName">出错</span>-->
+<!--            </div>-->
+<!--        </div>-->
         <div class="layui-form-item">
             <label for="accessCodeTypeSelect" class="layui-form-label">
                 分享类型
             </label>
             <div id="accessCodeTypeSelect">
+                <div id="randAccessCodeDiv">
                 <input id="randAccessCode" type="radio" name="accessCodeType" value="0" title="系统随机生成提取码" checked>
-                <br>
+                </div>
+                <div id="customAccessCodeDiv">
                 <input id="customAccessCode" type="radio" name="accessCodeType" value="1" title="自定义提取码">
+                </div>
+                <div id="customAccessCodeStrDiv" class="layui-input-block" style="display: none">
+                    <input id="customAccessCodeStr" type="text" style="width: 120px;height:20px; margin: 0 auto" placeholder="请输入四位字母或数字">
+                </div>
             </div>
         </div>
         <div class="layui-form-item">
             <label for="visitLimitSelect" class="layui-form-label">访问人数</label>
             <div id="visitLimitSelect">
-                <div>
-                    <input id="unLimit" type="radio" name="visitLimit" value="-1" title="无限制" checked>
+                <div id="unLimitDiv">
+                    <input id="unLimit" type="radio" name="visitLimitType" value="0" title="无限制" checked="">
                 </div>
-                <div>
-                    <input id="limit" type="radio" name="visitLimit" value="1" title="限制访问人数">
+                <div id="limitDiv">
+                    <input id="limit" type="radio" name="visitLimitType" value="1" title="限制访问人数" >
                 </div>
-                <div class="layui-input-block">
+                <div id="limitNumDiv" class="layui-input-block" style="display: none">
                     <input id="limitNum" type="text" style="width: 120px;height:20px; margin: 0 auto" placeholder="请输入0-10的整数">
                 </div>
             </div>
@@ -70,25 +76,45 @@
         </div>
         <div class="layui-form-item" >
             <div class="layui-input-block">
-                <button type="button" class="layui-btn" onclick=createFolder()>创建链接</button>
+                <button id="createShareLinkBtn" type="button" class="layui-btn">创建链接</button>
                 <button type="button" class="layui-btn layui-btn-primary" onclick="datacloud_close_refresh()">关闭</button>
             </div>
         </div>
     </form>
+
+
+    <form id="createSuccessForm" class="layui-form" style="display: none;margin: 0 auto">
+        <div class="layui-form-item">
+            <h3><b>分享链接创建成功！</b></h3>
+            <span>链接和提取码已复制，分享给你的朋友吧</span>
+        </div>
+        <div class="layui-form-item">
+            <label for="shareLink" class="layui-form-label" style="padding: 3px">
+                链接：
+            </label>
+            <div id="shareLink" class="layui-input-inline">
+                <input id="shareLinkStr" class="layui-input" type="text" value="" readonly="readonly" style="width: 240px">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="accessCode" class="layui-form-label" style="padding: 3px">
+                提取码：
+            </label>
+            <div id="accessCode" class="layui-input-inline">
+                <input id="accessCodeStr" class="layui-input" type="text" value="" readonly="readonly" style="width: 60px">
+            </div>
+        </div>
+        <div class="layui-form-item" >
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal" onclick="copyShareLink()">复制链接及提取码</button>
+                <button type="button" class="layui-btn layui-btn-primary" onclick="datacloud_close_refresh()">关闭</button>
+            </div>
+        </div>
+
+    </form>
 </div>
 <script>
-    function focusLimitNum(){
-        alert("222")
-        $("#limitNum").focus();
-    }
-    $("#limit").click(function (){
-        alert("ll")
-        $("#limitNum").focus();
-    });
-    document.getElementById("limitNum").addEventListener('focus',function (){
-        $("#limit").checked = true;
-        $("#unLimit").checked = false;
-    })
+    initFileShareCreateHtml();
 </script>
 </body>
 

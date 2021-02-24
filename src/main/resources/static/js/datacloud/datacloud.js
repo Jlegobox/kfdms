@@ -8,7 +8,7 @@ var pageParam = {
 }
 
 // 加载页面时操作
-function initFileDesk(){
+function initFileDesk() {
     getBaseFolderId()
     refreshFileDesk(deskFolderId)
 }
@@ -316,8 +316,8 @@ function getElemRow(elemParam) {
     if (elemParam.isFolder) {
         fileNameLink.innerHTML = "<b>" + elemParam.fileName + "</b>";
         fileNameLink.setAttribute("href", "javascript:refreshFileDesk(\"" + elemParam.fileId + "\");")
-    }else {
-        fileNameLink.setAttribute("style","color:black")
+    } else {
+        fileNameLink.setAttribute("style", "color:black")
     }
 
     fileName.appendChild(fileNameLink);
@@ -382,7 +382,7 @@ function createOperationBtn(fileOperation, elemParam) {
     let shareBtn = document.createElement('button');
     shareBtn.innerText = "分享"
     shareBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
-    shareBtn.setAttribute("onclick", "shareFile(" + elemParam.fileId + ")")
+    shareBtn.setAttribute("onclick", "shareFile(" + elemParam.fileId + ",\"" + elemParam.fileName + "\"," + elemParam.isFolder + ")")
 
     // 更多操作按钮
     let moreBtnGroup = document.createElement("div")
@@ -397,7 +397,7 @@ function createOperationBtn(fileOperation, elemParam) {
     editBtn.innerHTML = '<a href="javascript:openFileEditPage(' + elemParam.fileId + ')" onclick="">编辑</a>'
 
     let previewBtn = document.createElement("li")
-    previewBtn.innerHTML = '<a href="javascript:alert('+"\'敬请期待\'"+')">预览</a>'
+    previewBtn.innerHTML = '<a href="javascript:alert(' + "\'敬请期待\'" + ')">预览</a>'
 
     let deleteBtn = document.createElement("li")
     deleteBtn.innerHTML = '<a href="javascript:delFile(' + elemParam.fileId + "," + elemParam.isFolder + ')">删除</a>'
@@ -604,6 +604,123 @@ function openFileEditPage(fileId) {
     })
 }
 
+function shareFile(fileId, fileName, isFolder) {
+    sessionStorage["shareFileId"] = fileId;
+    sessionStorage["shareFileType"] = isFolder;
+    let index = x_admin_show('创建分享链接：' + fileName, 'DataCloud/Share/FileShareCreate.html', 600, 400)
+}
+
+function initFileShareCreateHtml() {
+    $("#limitDiv").click(function () {
+        $("#limitNumDiv").css("display", "block");
+    })
+    $("#unLimitDiv").click(function () {
+        $("#limitNumDiv").css("display", "none");
+    })
+    $("#randAccessCodeDiv").click(function () {
+        $("#customAccessCodeStrDiv").css("display", "none");
+    })
+    $("#customAccessCodeDiv").click(function () {
+        $("#customAccessCodeStrDiv").css("display", "block");
+    })
+    let shareFileId = sessionStorage["shareFileId"];
+    let shareFileType = sessionStorage["shareFileType"];
+    sessionStorage.removeItem("shareFileId")
+    sessionStorage.removeItem("shareFileType");
+    document.getElementById("createShareLinkBtn").setAttribute("onclick", "createShareLink(" + shareFileId + "," + shareFileType + ")")
+}
+
+function createShareLink(fileId, isFolder) {
+    let fileShareLinkInfo = {};
+    if (isFolder) {
+        fileShareLinkInfo['fileId'] = -1;
+        fileShareLinkInfo['folderId'] = fileId;
+    } else {
+        fileShareLinkInfo['fileId'] = fileId;
+        fileShareLinkInfo['folderId'] = -1;
+    }
+    let info = getJsonFromForm("fileShareLinkInfo"); // 得到的value均为字符串
+    if (info["accessCodeType"] === "1") {
+        let customAccessCode = $("#customAccessCodeStr").val();
+        if (customAccessCode.length !== 4) {
+            alert("请输入四位自定义提取码")
+            return;
+        }
+        fileShareLinkInfo["accessCode"] = $("#customAccessCodeStr").val();
+    } else {
+        fileShareLinkInfo["accessCode"] = -1;
+    }
+    if (info["visitLimitType"] === "1") {
+        let visitLimit = null
+        try {
+            visitLimit = parseInt($("#limitNum").val());
+        } catch (e) {
+            alert("请输入正确限制访问人数")
+        }
+        if (visitLimit < 1 || visitLimit > 10) {
+            alert("请输入正确限制访问人数");
+            return;
+        }
+        fileShareLinkInfo["visitLimit"] = visitLimit;
+    } else {
+        fileShareLinkInfo["visitLimit"] = -1;
+    }
+    fileShareLinkInfo["validPeriod"] = info["validTime"];
+    $.ajax({
+        url: "createLink.ajax",
+        type: "POST",
+        data: fileShareLinkInfo,
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("lg_token", sessionStorage["lg_token"])
+        },
+        success: function (result) {
+            result = JSON.parse(result);
+            let shareLink = result["dataMap"]["shareLink"];
+            let accessCode = result["dataMap"]["accessCode"];
+            $("#fileShareLinkInfo").css("display","none");
+            $("#createSuccessForm").css("display","block");
+            $("#shareLinkStr").val(shareLink);
+            $("#accessCodeStr").val(accessCode)
+            let content = "链接："+shareLink+" \n" +
+                "提取码："+accessCode+" \n"
+            copyToClipBord(content);
+        },
+        error: function (result) {
+            alert("error")
+        }
+    })
+}
+
+function copyShareLink(){
+    let shareLink = $("#shareLinkStr").val(shareLink);
+    let accessCode = $("#accessCodeStr").val(accessCode);
+    let content = "链接："+shareLink+" \n" +
+        "提取码："+accessCode+" \n";
+    copyToClipBord(content);
+}
+
+function getJsonFromForm(id) { // 得到的value均为字符串
+    let infoArray = $("#" + id).serializeArray();
+    let info = {};
+    for (let i = 0; i < infoArray.length; i++) {
+        info[infoArray[i].name] = infoArray[i].value
+    }
+    return info;
+}
+
+function getRandomStr(num) {
+    return "1234";
+}
+
+function copyToClipBord(content){
+    let aux = document.createElement("input");
+    aux.setAttribute("value", content);
+    document.body.appendChild(aux);
+    aux.select();
+    document.execCommand("copy");
+    document.body.removeChild(aux);
+
+}
 
 function datacloud_close_refresh() {
     x_admin_close();

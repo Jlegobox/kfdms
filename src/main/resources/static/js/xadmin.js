@@ -359,6 +359,7 @@ function getCateId(cateId) {
     id      需要操作的数据id
     w       弹出层宽度（缺省调默认值）
     h       弹出层高度（缺省调默认值）
+    返回弹窗的iframe
 */
 function x_admin_show(title,url,w,h,full=false){
     if (title == null || title == '') {
@@ -398,6 +399,8 @@ function x_admin_show(title,url,w,h,full=false){
     if(full){
        layer.full(index); 
     }
+    // 返回弹窗的iframe index
+    return index;
 }
 
 /*关闭弹出框口*/
