@@ -3,6 +3,8 @@ package com.mp.kfdms.mapper;
 import com.mp.kfdms.domain.FileShareShareLog;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 文件分享操作
  * @Author J
@@ -23,5 +25,10 @@ public interface FileShareMapper {
 
     public FileShareShareLog getShareLogById(int logId);
 
-
+    /**
+     * 返回用户创建的所有未删除记录
+     * @param id
+     * @return
+     */
+    public List<FileShareShareLog> getShareLogByUserId(int id);
 }

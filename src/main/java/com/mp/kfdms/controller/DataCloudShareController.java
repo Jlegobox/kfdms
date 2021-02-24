@@ -43,4 +43,11 @@ public class DataCloudShareController {
 
         return GsonUtil.instance().toJson(jsonModel);
     }
+
+    @RequestMapping("getShareLinkList.ajax")
+    @ResponseBody
+    public String getShareLinkList(@CurrentUser final User currentUser){
+        JsonModel shareLinkList = fileShareService.getShareLinkList(currentUser);
+        return GsonUtil.instance().toJson(shareLinkList);
+    }
 }

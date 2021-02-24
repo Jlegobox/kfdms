@@ -8,6 +8,7 @@ import com.mp.kfdms.enumeration.FileShareShareLogStatusEnum;
 import com.mp.kfdms.mapper.FileNodeMapper;
 import com.mp.kfdms.mapper.FileShareMapper;
 import com.mp.kfdms.mapper.FolderMapper;
+import com.mp.kfdms.mapper.UserMapper;
 import com.mp.kfdms.pojo.FileShareLinkInfo;
 import com.mp.kfdms.pojo.FolderView;
 import com.mp.kfdms.pojo.JsonModel;
@@ -20,6 +21,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @Author J
@@ -38,25 +40,31 @@ public class FileShareService {
     @Resource
     private FolderMapper folderMapper;
 
+    @Resource
+    private UserMapper userMapper;
+
     public JsonModel createLink(User currentUser, FileShareLinkInfo fileShareLinkInfo) {
         JsonModel jsonModel = new JsonModel();
         jsonModel.setMessage("error");
+        currentUser = userMapper.findOneByEmail(currentUser);
         boolean shareAuth = UserUtil.checkFileShareAuth(currentUser, fileShareLinkInfo);
         if (shareAuth) {
             FileShareShareLog shareLog = FileShareUtil.getShareLog(currentUser, fileShareLinkInfo);
             if (shareLog != null) {
-                // 先创建记录
+                // 查找分享文件是否存在
+                if (shareLog.getFileId() != -1) {
+                    FileNode fileById = fileNodeMapper.getFileById(shareLog.getFileId());
+                    if (fileById == null)
+                        return jsonModel;
+                    shareLog.setFileName(fileById.getFile_name());
+                } else if (shareLog.getFolderId() != -1) { // 查找分享文件夹是否存在
+                    Folder folderById = folderMapper.getFolderById(shareLog.getFolderId());
+                    if (folderById == null)
+                        return jsonModel;
+                    shareLog.setFileName(folderById.getFolder_name());
+                }
+                // 文件存在，则先创建记录
                 if (fileShareMapper.addShareLog(shareLog) > 0){
-                    // 查找分享文件是否存在
-                    if (shareLog.getFileId() != -1) {
-                        FileNode fileById = fileNodeMapper.getFileById(shareLog.getFileId());
-                        if (fileById == null)
-                            return jsonModel;
-                    } else if (shareLog.getFolderId() != -1) { // 查找分享文件夹是否存在
-                        Folder folderById = folderMapper.getFolderById(shareLog.getFolderId());
-                        if (folderById == null)
-                            return jsonModel;
-                    }
                     // 创建加密网址
                     String shareLink = FileShareUtil.createShareLink(shareLog);
                     if (shareLink != null) {
@@ -130,5 +138,17 @@ public class FileShareService {
             folderView.setFilesPermission(fileNodesPermission);
         }
         return GsonUtil.instance().toJson(folderView);
+    }
+
+    public JsonModel getShareLinkList(User currentUser) {
+        JsonModel jsonModel = new JsonModel();
+        currentUser = userMapper.findOneByEmail(currentUser);
+        if(currentUser != null){
+            List<FileShareShareLog> shareLinkList = fileShareMapper.getShareLogByUserId(currentUser.getId());
+            jsonModel.setData(shareLinkList);
+            return jsonModel;
+        }
+        jsonModel.setMessage("error");
+        return jsonModel;
     }
 }

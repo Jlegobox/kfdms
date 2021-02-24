@@ -1,0 +1,96 @@
+<html class="x-admin-sm">
+<head>
+    <meta charset="UTF-8">
+    <title>我的分享链接列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" href="../../css/font.css">
+    <link rel="stylesheet" href="../../css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../../lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../../js/xadmin.js"></script>
+    <script type="text/javascript" src="../../js/cookie.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!--boostrap-->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="../../js/datacloud/datacloud.js"></script>
+    <script src="../../js/kfdms-notice.js"></script>
+    <script src="../../js/datacloud/fileShare.js"></script>
+</head>
+
+<body>
+<div class="x-nav" >
+    <xblock>
+        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
+        <button class="layui-btn layui-btn-danger" id="uploadMultiFile"><i class="layui-icon layui-icon-upload-circle"></i>批量上传</button>
+        <button class="layui-btn" onclick="x_admin_show('新建文件夹','./folder-add.html',600,400)"><i class="layui-icon layui-icon-file"></i>新建文件夹</button>
+        <button class="layui-btn" onclick="x_admin_show('上传文件','./file-add.html',600,400)"><i class="layui-icon layui-icon-upload-circle"></i>上传文件</button>
+        <span style="float: right">
+        <span id="synTime"></span>
+          <button id="refreshFileShareLinkList" type="button" class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px"
+                  href="" onclick="initFileShareLinkListHtml()" title="刷新"> <!---->
+            <i class="layui-icon layui-icon-refresh"></i></button>
+        </span>
+    </xblock>
+</div>
+<div class="x-body">
+    <table class="layui-table x-admin" id="fileShareLinkListTable">
+        <thead>
+        <tr>
+            <th>
+                <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+            </th>
+            <th>分享文件</th>
+            <th>分享时间</th>
+            <th>失效时间</th>
+            <th>访问次数</th>
+            <th>访问上限</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="fileShareLink_tbody">
+        <tr>
+            <td>
+                <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i class="layui-icon">&#xe605;</i></div>
+            </td>
+            <td>t</td>
+            <td>小明</td>
+            <td>男</td>
+            <td>13000000000</td>
+            <td>2017-01-01 11:11:42</td>
+            <td class="td-status">
+                <span class="layui-btn layui-btn-normal layui-btn-mini">已启用</span></td>
+            <td class="td-manage">
+                <div class="layui-btn-group">
+                    <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal">下载</button>
+                    <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal">分享</button>
+                    <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-disabled">预览</button>
+                    <div class="btn-group">
+                        <button type="button" class="layui-btn layui-btn-normal" data-toggle="dropdown">更多
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a onclick="alert('功能')">功能</a></li>
+                            <li><a href="#">另一个功能</a></li>
+                            <li><a href="#">其他</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">分离的链接</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    initFileShareLinkListHtml()
+</script>
+</body>
+</html>

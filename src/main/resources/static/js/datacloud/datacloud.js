@@ -236,19 +236,19 @@ function loadTotalCount(pageParam) {
 function loadFolderData(folderView) {
     // folderView = JSON.parse(folderView)
     // 拿到文件夹、文件以及对应的权限列表
-    var folders = folderView.folders;
-    var files = folderView.files;
-    var foldersPermission = folderView.foldersPermission;
-    var filesPermission = folderView.filesPermission;
+    let folders = folderView.folders;
+    let files = folderView.files;
+    let foldersPermission = folderView.foldersPermission;
+    let filesPermission = folderView.filesPermission;
     displayFoldersElem(folders, foldersPermission);
     displayFilesElem(files, filesPermission);
 }
 
 function displayFoldersElem(folders, foldersPermission) {
     //获得表格
-    var tbody = document.getElementById("file_desk_tbody");
+    let tbody = document.getElementById("file_desk_tbody");
     // 打包成展示对象，包括权限的设置等
-    var elemParam = {
+    let elemParam = {
         fileId: "",
         fileName: "",
         fileType: "",
@@ -259,7 +259,7 @@ function displayFoldersElem(folders, foldersPermission) {
         isFolder: ""
         // file_operation:""
     }
-    for (var i = 0; i < folders.length; i++) {
+    for (let i = 0; i < folders.length; i++) {
         elemParam.fileId = folders[i].folder_id;
         elemParam.fileName = folders[i].folder_name;
         elemParam.fileType = "文件夹";
@@ -268,7 +268,7 @@ function displayFoldersElem(folders, foldersPermission) {
         elemParam.fileSize = "" // folders[i].folder_size;
         elemParam.fileDescription = folders[i].folder_description;
         elemParam.isFolder = 1
-        var trow = getElemRow(elemParam);
+        let trow = getElemRow(elemParam);
         tbody.appendChild(trow);
     }
 }
@@ -608,119 +608,6 @@ function shareFile(fileId, fileName, isFolder) {
     sessionStorage["shareFileId"] = fileId;
     sessionStorage["shareFileType"] = isFolder;
     let index = x_admin_show('创建分享链接：' + fileName, 'DataCloud/Share/FileShareCreate.html', 600, 400)
-}
-
-function initFileShareCreateHtml() {
-    $("#limitDiv").click(function () {
-        $("#limitNumDiv").css("display", "block");
-    })
-    $("#unLimitDiv").click(function () {
-        $("#limitNumDiv").css("display", "none");
-    })
-    $("#randAccessCodeDiv").click(function () {
-        $("#customAccessCodeStrDiv").css("display", "none");
-    })
-    $("#customAccessCodeDiv").click(function () {
-        $("#customAccessCodeStrDiv").css("display", "block");
-    })
-    let shareFileId = sessionStorage["shareFileId"];
-    let shareFileType = sessionStorage["shareFileType"];
-    sessionStorage.removeItem("shareFileId")
-    sessionStorage.removeItem("shareFileType");
-    document.getElementById("createShareLinkBtn").setAttribute("onclick", "createShareLink(" + shareFileId + "," + shareFileType + ")")
-}
-
-function createShareLink(fileId, isFolder) {
-    let fileShareLinkInfo = {};
-    if (isFolder) {
-        fileShareLinkInfo['fileId'] = -1;
-        fileShareLinkInfo['folderId'] = fileId;
-    } else {
-        fileShareLinkInfo['fileId'] = fileId;
-        fileShareLinkInfo['folderId'] = -1;
-    }
-    let info = getJsonFromForm("fileShareLinkInfo"); // 得到的value均为字符串
-    if (info["accessCodeType"] === "1") {
-        let customAccessCode = $("#customAccessCodeStr").val();
-        if (customAccessCode.length !== 4) {
-            alert("请输入四位自定义提取码")
-            return;
-        }
-        fileShareLinkInfo["accessCode"] = $("#customAccessCodeStr").val();
-    } else {
-        fileShareLinkInfo["accessCode"] = -1;
-    }
-    if (info["visitLimitType"] === "1") {
-        let visitLimit = null
-        try {
-            visitLimit = parseInt($("#limitNum").val());
-        } catch (e) {
-            alert("请输入正确限制访问人数")
-        }
-        if (visitLimit < 1 || visitLimit > 10) {
-            alert("请输入正确限制访问人数");
-            return;
-        }
-        fileShareLinkInfo["visitLimit"] = visitLimit;
-    } else {
-        fileShareLinkInfo["visitLimit"] = -1;
-    }
-    fileShareLinkInfo["validPeriod"] = info["validTime"];
-    $.ajax({
-        url: "createLink.ajax",
-        type: "POST",
-        data: fileShareLinkInfo,
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("lg_token", sessionStorage["lg_token"])
-        },
-        success: function (result) {
-            result = JSON.parse(result);
-            let shareLink = result["dataMap"]["shareLink"];
-            let accessCode = result["dataMap"]["accessCode"];
-            $("#fileShareLinkInfo").css("display","none");
-            $("#createSuccessForm").css("display","block");
-            $("#shareLinkStr").val(shareLink);
-            $("#accessCodeStr").val(accessCode)
-            let content = "链接："+shareLink+" \n" +
-                "提取码："+accessCode+" \n"
-            copyToClipBord(content);
-        },
-        error: function (result) {
-            alert("error")
-        }
-    })
-}
-
-function copyShareLink(){
-    let shareLink = $("#shareLinkStr").val();
-    let accessCode = $("#accessCodeStr").val();
-    let content = "链接："+shareLink+" \n" +
-        "提取码："+accessCode+" \n";
-    alertConfirmTrans("链接已复制到剪切板！",1000)
-    copyToClipBord(content);
-}
-
-function getJsonFromForm(id) { // 得到的value均为字符串
-    let infoArray = $("#" + id).serializeArray();
-    let info = {};
-    for (let i = 0; i < infoArray.length; i++) {
-        info[infoArray[i].name] = infoArray[i].value
-    }
-    return info;
-}
-
-function getRandomStr(num) {
-    return "1234";
-}
-
-function copyToClipBord(content){
-    let aux = document.createElement("input");
-    aux.setAttribute("value", content);
-    document.body.appendChild(aux);
-    aux.select();
-    document.execCommand("copy");
-    document.body.removeChild(aux);
-
 }
 
 function datacloud_close_refresh() {
