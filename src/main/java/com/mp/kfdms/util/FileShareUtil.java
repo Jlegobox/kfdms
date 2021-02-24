@@ -19,23 +19,23 @@ public class FileShareUtil {
     private static String CODE_SALT = "codeSalt";
     private static String accessCodeCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    public static FileShareShareLog getShareLog(User currentUser, FileShareLinkInfo fileShareLinkInfo){
+    public static FileShareShareLog getShareLog(User currentUser, FileShareLinkInfo fileShareLinkInfo) {
         FileShareShareLog fileShareShareLog = new FileShareShareLog();
         fileShareShareLog.setUserId(currentUser.getId());
         fileShareShareLog.setFileId(fileShareLinkInfo.getFileId());
         fileShareShareLog.setFolderId(fileShareLinkInfo.getFolderId());
         String accessCode = fileShareLinkInfo.getAccessCode();
-        if(accessCode == null){ // 没有指定的话就为空，考虑放到前端
+        if ("-1".equals(accessCode)) { // -1为随机
             StringBuilder randomAccessCode = new StringBuilder();
             Random random = new Random();
-            for(int i =0;i<4;i++){
+            for (int i = 0; i < 4; i++) {
                 randomAccessCode.append(accessCodeCharacter.charAt(random.nextInt(accessCodeCharacter.length())));
             }
             accessCode = randomAccessCode.toString();
         }
         fileShareShareLog.setAccessCode(accessCode);
         fileShareShareLog.setVisitNum(0);
-        if(fileShareLinkInfo.getVisitLimit() == 0)
+        if (fileShareLinkInfo.getVisitLimit() == 0)
             return null;
         fileShareShareLog.setVisitLimit(fileShareLinkInfo.getVisitLimit());
         fileShareShareLog.setValidPeriod(fileShareLinkInfo.getValidPeriod());
@@ -44,10 +44,10 @@ public class FileShareUtil {
         fileShareShareLog.setCreateTime(instance.getTime());
         //设置过期时间
         int validPeriod = fileShareLinkInfo.getValidPeriod();
-        if(validPeriod != -1){
+        if (validPeriod != -1) {
             instance.add(Calendar.DATE, validPeriod);
             fileShareShareLog.setExpiredTime(instance.getTime());
-        }else {
+        } else {
             fileShareShareLog.setExpiredTime(null);
         }
         fileShareShareLog.setDeleteTime(null);
@@ -58,14 +58,15 @@ public class FileShareUtil {
 
     /**
      * 根据logId和accessCode创建一个密文
+     *
      * @param shareLog
      * @return
      */
     public static String createShareLink(FileShareShareLog shareLog) {
         int shareLogId = shareLog.getShareLogId();
         // 强行破解还需要CODE_SALT
-        String encodedContent = AESUtil.decodeBase64(String.valueOf(shareLogId), shareLog.getAccessCode() + CODE_SALT);
-        if(encodedContent!=null){
+        String encodedContent = AESUtil.encodeBase64(String.valueOf(shareLogId) + CODE_SALT, shareLog.getAccessCode() + CODE_SALT);
+        if (encodedContent != null) {
             return encodedContent;
         }
         return null;
@@ -73,19 +74,20 @@ public class FileShareUtil {
 
     /**
      * 根据shareLink和输入的AccessCode返回logId
+     *
      * @param shareLink
      * @param accessCode
      * @return
      */
-    public static int decodeShareLink(String shareLink, String accessCode){
-        if(accessCode == null || shareLink == null)
+    public static int decodeShareLink(String shareLink, String accessCode) {
+        if (accessCode == null || shareLink == null)
             return -1;
         String s = AESUtil.decodeBase64(shareLink, accessCode + CODE_SALT);
-        if(s!=null){
-            try{
-                int logId = Integer.parseInt(s);
+        if (s != null && s.length() > CODE_SALT.length()) {
+            try {
+                int logId = Integer.parseInt(s.substring(0, s.length() - CODE_SALT.length()));
                 return logId;
-            }catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
         }

@@ -15,6 +15,7 @@ public class FileShareShareLog {
     private int fileId;
     private int folderId;
     private String accessCode;
+    private String shareLink;
     private int visitNum; // 已访问数量
     private int visitLimit; // 可访问上限
     private int validPeriod; // 有效期 单位为天 -1 为无限
@@ -62,6 +63,14 @@ public class FileShareShareLog {
 
     public void setAccessCode(String accessCode) {
         this.accessCode = accessCode;
+    }
+
+    public String getShareLink() {
+        return shareLink;
+    }
+
+    public void setShareLink(String shareLink) {
+        this.shareLink = shareLink;
     }
 
     public int getVisitNum() {

@@ -10,6 +10,7 @@ import com.mp.kfdms.mapper.FileShareMapper;
 import com.mp.kfdms.mapper.FolderMapper;
 import com.mp.kfdms.pojo.FileShareLinkInfo;
 import com.mp.kfdms.pojo.FolderView;
+import com.mp.kfdms.pojo.JsonModel;
 import com.mp.kfdms.util.FileShareUtil;
 import com.mp.kfdms.util.GsonUtil;
 import com.mp.kfdms.util.UserUtil;
@@ -37,42 +38,50 @@ public class FileShareService {
     @Resource
     private FolderMapper folderMapper;
 
-    public String createLink(User currentUser, FileShareLinkInfo fileShareLinkInfo) {
+    public JsonModel createLink(User currentUser, FileShareLinkInfo fileShareLinkInfo) {
+        JsonModel jsonModel = new JsonModel();
+        jsonModel.setMessage("error");
         boolean shareAuth = UserUtil.checkFileShareAuth(currentUser, fileShareLinkInfo);
         if (shareAuth) {
             FileShareShareLog shareLog = FileShareUtil.getShareLog(currentUser, fileShareLinkInfo);
             if (shareLog != null) {
                 // 先创建记录
-                int account = fileShareMapper.addShareLog(shareLog);
-                // 记录创建失败
-                if (account == 0)
-                    return "error";
-                // 查找分享文件是否存在
-                if (shareLog.getFileId() != -1) {
-                    FileNode fileById = fileNodeMapper.getFileById(shareLog.getFileId());
-                    if (fileById == null)
-                        return "error";
-                } else if (shareLog.getFolderId() != -1) { // 查找分享文件夹是否存在
-                    Folder folderById = folderMapper.getFolderById(shareLog.getFolderId());
-                    if (folderById == null)
-                        return "error";
-                }
-                String shareLink = FileShareUtil.createShareLink(shareLog);
-                if (shareLink != null) {
-                    shareLog.setStatus(FileShareShareLogStatusEnum.SHARING.ordinal());
-                    fileShareMapper.updateShareLog(shareLog);
-                    return "success";
+                if (fileShareMapper.addShareLog(shareLog) > 0){
+                    // 查找分享文件是否存在
+                    if (shareLog.getFileId() != -1) {
+                        FileNode fileById = fileNodeMapper.getFileById(shareLog.getFileId());
+                        if (fileById == null)
+                            return jsonModel;
+                    } else if (shareLog.getFolderId() != -1) { // 查找分享文件夹是否存在
+                        Folder folderById = folderMapper.getFolderById(shareLog.getFolderId());
+                        if (folderById == null)
+                            return jsonModel;
+                    }
+                    // 创建加密网址
+                    String shareLink = FileShareUtil.createShareLink(shareLog);
+                    if (shareLink != null) {
+                        // TODO: 2021/2/24 服务器地址自动获取
+                        shareLink = "localhost:8080/DataCloud/s/"+shareLink;
+                        shareLog.setStatus(FileShareShareLogStatusEnum.SHARING.ordinal());
+                        shareLog.setShareLink(shareLink);
+                        if (fileShareMapper.updateShareLog(shareLog) > 0){
+                            jsonModel.setMessage("success");
+                            jsonModel.put("shareLink", shareLink);
+                            jsonModel.put("accessCode", shareLog.getAccessCode());
+                        }
+                        return jsonModel;
+                    }
                 }
             }
         }
-        return "error";
+        return jsonModel;
     }
 
     public String checkShareLink(User currentUser, String shareLink, String accessCode) {
         int logId = FileShareUtil.decodeShareLink(shareLink, accessCode);
         if (logId != -1) { // 解密获得了logId
             int updateFlag = 0;
-            while(updateFlag<10){ // 乐观锁，尝试十次。基于版本号的CAS锁保证线程安全
+            while (updateFlag < 10) { // 乐观锁，尝试十次。基于版本号的CAS锁保证线程安全
                 updateFlag++;
                 FileShareShareLog shareLog = fileShareMapper.getShareLogById(logId);
                 if (shareLog != null && shareLog.getStatus() == FileShareShareLogStatusEnum.SHARING.ordinal()) { // 链接为分享中
@@ -85,7 +94,7 @@ public class FileShareService {
                         }
                         shareLog.setVisitNum(visitNum);
                         // 使用版本号实现乐观锁
-                        if(fileShareMapper.updateShareLog(shareLog)>0){ // 更新成功
+                        if (fileShareMapper.updateShareLog(shareLog) > 0) { // 更新成功
                             return getShareView(shareLog);
                         }
                     } else {
@@ -103,7 +112,7 @@ public class FileShareService {
 
     public String getShareView(FileShareShareLog shareLog) {
         FolderView folderView = new FolderView();
-        if(shareLog.getFolderId() != -1){
+        if (shareLog.getFolderId() != -1) {
             Folder folderById = folderMapper.getFolderById(shareLog.getFolderId());
             ArrayList<Folder> folders = new ArrayList<>();
             ArrayList<String> foldersPermission = new ArrayList<>();
@@ -112,7 +121,7 @@ public class FileShareService {
             folderView.setFolders(folders);
             folderView.setFoldersPermission(foldersPermission);
         }
-        if(shareLog.getFileId() != -1){
+        if (shareLog.getFileId() != -1) {
             FileNode fileById = fileNodeMapper.getFileById(shareLog.getFileId());
             ArrayList<FileNode> fileNodes = new ArrayList<>();
             ArrayList<String> fileNodesPermission = new ArrayList<>();

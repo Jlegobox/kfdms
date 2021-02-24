@@ -3,8 +3,10 @@ package com.mp.kfdms.controller;
 import com.mp.kfdms.annotation.CurrentUser;
 import com.mp.kfdms.domain.User;
 import com.mp.kfdms.pojo.FileShareLinkInfo;
+import com.mp.kfdms.pojo.JsonModel;
 import com.mp.kfdms.service.FileShareService;
 import com.mp.kfdms.util.FileShareUtil;
+import com.mp.kfdms.util.GsonUtil;
 import com.mp.kfdms.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,9 +39,8 @@ public class DataCloudShareController {
     @ResponseBody
     public String createLink(@CurrentUser final User currentUser, final FileShareLinkInfo fileShareLinkInfo){
         // 权限校验
-        fileShareService.createLink(currentUser,fileShareLinkInfo);
+        JsonModel jsonModel = fileShareService.createLink(currentUser, fileShareLinkInfo);
 
-        System.out.println(fileShareLinkInfo);
-        return "success";
+        return GsonUtil.instance().toJson(jsonModel);
     }
 }
