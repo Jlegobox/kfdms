@@ -14,6 +14,7 @@ public class FileShareShareLog {
     private int userId;
     private int fileId;
     private int folderId;
+    private String fileName;
     private String accessCode;
     private String shareLink;
     private int visitNum; // 已访问数量
@@ -55,6 +56,14 @@ public class FileShareShareLog {
 
     public void setFolderId(int folderId) {
         this.folderId = folderId;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getAccessCode() {
@@ -144,7 +153,9 @@ public class FileShareShareLog {
                 ", userId=" + userId +
                 ", fileId=" + fileId +
                 ", folderId=" + folderId +
+                ", fileName='" + fileName + '\'' +
                 ", accessCode='" + accessCode + '\'' +
+                ", shareLink='" + shareLink + '\'' +
                 ", visitNum=" + visitNum +
                 ", visitLimit=" + visitLimit +
                 ", validPeriod=" + validPeriod +
