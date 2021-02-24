@@ -692,10 +692,11 @@ function createShareLink(fileId, isFolder) {
 }
 
 function copyShareLink(){
-    let shareLink = $("#shareLinkStr").val(shareLink);
-    let accessCode = $("#accessCodeStr").val(accessCode);
+    let shareLink = $("#shareLinkStr").val();
+    let accessCode = $("#accessCodeStr").val();
     let content = "链接："+shareLink+" \n" +
         "提取码："+accessCode+" \n";
+    alertConfirmTrans("链接已复制到剪切板！",1000)
     copyToClipBord(content);
 }
 
