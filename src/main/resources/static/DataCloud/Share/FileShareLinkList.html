@@ -27,14 +27,12 @@
 <body>
 <div class="x-nav" >
     <xblock>
-        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
-        <button class="layui-btn layui-btn-danger" id="uploadMultiFile"><i class="layui-icon layui-icon-upload-circle"></i>批量上传</button>
-        <button class="layui-btn" onclick="x_admin_show('新建文件夹','./folder-add.html',600,400)"><i class="layui-icon layui-icon-file"></i>新建文件夹</button>
-        <button class="layui-btn" onclick="x_admin_show('上传文件','./file-add.html',600,400)"><i class="layui-icon layui-icon-upload-circle"></i>上传文件</button>
+        <button class="layui-btn layui-btn-normal" onclick="copyAllShareLink()">批量复制</button>
+        <button id="cancelAllShareLinkBtn" class="layui-btn layui-btn-danger" onclick="cancelAllShareLink()">批量删除</button>
         <span style="float: right">
         <span id="synTime"></span>
           <button id="refreshFileShareLinkList" type="button" class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px"
-                  href="" onclick="initFileShareLinkListHtml()" title="刷新"> <!---->
+                  href="" onclick="initFileShareLinkListHtml()" title="刷新">
             <i class="layui-icon layui-icon-refresh"></i></button>
         </span>
     </xblock>
@@ -44,7 +42,9 @@
         <thead>
         <tr>
             <th>
-                <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+                <div style='text-align: center'>
+                    <input id="headerCheckBox" class='layui-form-checkbox' lay-skin='primary'  type='checkbox'>
+                </div>
             </th>
             <th>分享文件</th>
             <th>分享时间</th>

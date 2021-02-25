@@ -65,12 +65,12 @@ function createShareLink(fileId, isFolder) {
             result = JSON.parse(result);
             let shareLink = result["dataMap"]["shareLink"];
             let accessCode = result["dataMap"]["accessCode"];
-            $("#fileShareLinkInfo").css("display","none");
-            $("#createSuccessForm").css("display","block");
+            $("#fileShareLinkInfo").css("display", "none");
+            $("#createSuccessForm").css("display", "block");
             $("#shareLinkStr").val(shareLink);
             $("#accessCodeStr").val(accessCode)
-            let content = "链接："+shareLink+" \n" +
-                "提取码："+accessCode+" \n"
+            let content = "链接：" + shareLink + " \n" +
+                "提取码：" + accessCode + " \n"
             copyToClipBord(content);
         },
         error: function (result) {
@@ -79,17 +79,17 @@ function createShareLink(fileId, isFolder) {
     })
 }
 
-function getShareMessage(shareLink, accessCode){
-    return "链接："+shareLink+" \n" +
-        "提取码："+accessCode+" \n";
+function getShareMessage(shareLink, accessCode) {
+    return "链接：" + shareLink + " \n" +
+        "提取码：" + accessCode + " \n";
 }
 
 
-function copyShareLink(){
+function copyShareLink() {
     let shareLink = $("#shareLinkStr").val();
     let accessCode = $("#accessCodeStr").val();
     let content = getShareMessage(shareLink, accessCode)
-    alertConfirmTrans("链接已复制到剪切板！",1000)
+    alertConfirmTrans("链接已复制到剪切板！", 1000)
     copyToClipBord(content);
 }
 
@@ -102,7 +102,7 @@ function getJsonFromForm(id) { // 得到的value均为字符串
     return info;
 }
 
-function copyToClipBord(content){
+function copyToClipBord(content) {
     let aux = document.createElement("input");
     aux.setAttribute("value", content);
     document.body.appendChild(aux);
@@ -112,65 +112,78 @@ function copyToClipBord(content){
 
 }
 
-function initFileShareLinkListHtml(){
+function initFileShareLinkListHtml() {
     // 保证导航的面包屑class起作用，不然默认隐藏
-    layui.use('element', function(){
+    layui.use('element', function () {
         var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
 
         //监听导航点击
-        element.on('nav(demo)', function(elem){
+        element.on('nav(demo)', function (elem) {
             //console.log(elem)
             layer.msg(elem.text());
         });
     });
 
+    // 表格全选事件
+    document.getElementById("headerCheckBox").addEventListener('click',function (){
+        changeAllCheckBox("headerCheckBox");
+    })
+
     $.ajax({
-        url:"getShareLinkList.ajax",
-        type:"POST",
-        beforeSend:function (xhr){
-            xhr.setRequestHeader("lg_token",sessionStorage["lg_token"])
+        url: "getShareLinkList.ajax",
+        type: "POST",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("lg_token", sessionStorage["lg_token"])
         },
-        success:function (result){
+        success: function (result) {
             result = JSON.parse(result)
             loadFileShareLinkList(result.data)
         },
-        error:function (result){
+        error: function (result) {
             alert("error")
         }
     })
 }
 
 var shareLinkTemplate = {
-    "shareLogId":0,
-    "fileName":0, // fileName或者folderName为空则不展示
-    "folderName":0,
-    "createTime":0,
-    "expiredTime":0,
-    "shareLink":0,
-    "accessCode":0,
-    "status":0,
-    "visitNum":0,
-    "visitLimit":0
+    "shareLogId": 0,
+    "fileName": 0, // fileName或者folderName为空则不展示
+    "folderName": 0,
+    "createTime": 0,
+    "expiredTime": 0,
+    "shareLink": 0,
+    "accessCode": 0,
+    "status": 0,
+    "visitNum": 0,
+    "visitLimit": 0
 }
 
-function loadFileShareLinkList(shareLinkList){
+function loadFileShareLinkList(shareLinkList) {
     let tbody = document.getElementById("fileShareLink_tbody");
     tbody.innerHTML = "";
-    for(let i=0;i<shareLinkList.length;i++){
+    for (let i = 0; i < shareLinkList.length; i++) {
         let row = createFileShareLinkTableRow(shareLinkList[i]);
+        row.setAttribute("id", "row" + i)
+        let shareblock = document.createElement("div")
+        shareblock.innerText = getShareMessage(shareLinkList[i].shareLink, shareLinkList[i].accessCode);
+        shareblock.setAttribute("style", "display:none");
+        shareblock.setAttribute("id", "shareblock" + shareLinkList[i].shareLogId);
+        row.appendChild(shareblock);
         tbody.appendChild(row);
     }
+    document.getElementById("cancelAllShareLinkBtn").setAttribute("onclick", "cancelAllShareLink()");
 }
 
-function createFileShareLinkTableRow(shareLink){
+function createFileShareLinkTableRow(shareLink) {
     let row = document.createElement('tr');
 
     let checkBox = document.createElement('td');
-    checkBox.innerHTML = "<div class=\"layui-unselect layui-form-checkbox\" lay-skin=\"primary\" data-id='2'><i class=\"layui-icon\">&#xe605;</i></div>";
+    // value 储存shareLogId
+    checkBox.innerHTML = "<div style='text-align: center'><input value=" + shareLink.shareLogId + " class='layui-form-checkbox' lay-skin='primary'  type='checkbox'></div>"
     row.appendChild(checkBox);
 
     let fileName = document.createElement('td');
-    fileName.innerHTML = "<a><b>"+shareLink.fileName+"</b></a>";
+    fileName.innerHTML = "<a><b>" + shareLink["fileName"] + "</b></a>";
     row.appendChild(fileName)
 
     let createTime = document.createElement('td');
@@ -178,9 +191,9 @@ function createFileShareLinkTableRow(shareLink){
     row.appendChild(createTime)
 
     let expireTime = document.createElement('td');
-    if(shareLink.expiredTime == null || shareLink.expiredTime === "undefined"){
+    if (shareLink.expiredTime == null || shareLink.expiredTime === "undefined") {
         expireTime.innerText = "无期限";
-    }else {
+    } else {
         expireTime.innerText = shareLink.expiredTime;
     }
     row.appendChild(expireTime)
@@ -190,9 +203,9 @@ function createFileShareLinkTableRow(shareLink){
     row.appendChild(visitNum)
 
     let visitLimit = document.createElement('td');
-    if(shareLink.visitLimit == null || shareLink.visitLimit === "undefined" || shareLink.visitLimit === -1){
+    if (shareLink.visitLimit == null || shareLink.visitLimit === "undefined" || shareLink.visitLimit === -1) {
         visitLimit.innerText = "无限制";
-    }else {
+    } else {
         visitLimit.innerText = shareLink.visitLimit;
     }
     row.appendChild(visitLimit)
@@ -201,17 +214,17 @@ function createFileShareLinkTableRow(shareLink){
     let operationBtn = document.createElement('td');
     // operationBtn.setAttribute("class","layui-btn-group")
     let copyBtn = document.createElement('button')
-    copyBtn.setAttribute("class","layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
-    copyBtn.addEventListener('click',function (){
-        let content = getShareMessage(shareLink.shareLink,shareLink.accessCode);
+    copyBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
+    copyBtn.addEventListener('click', function () {
+        let content = getShareMessage(shareLink.shareLink, shareLink.accessCode);
         copyToClipBord(content);
-        alertConfirmTrans("已复制到粘贴板",1000);
+        alertConfirmTrans("已复制到粘贴板", 1000);
     })
     copyBtn.innerText = "复制链接"
     operationBtn.appendChild(copyBtn);
     let cancelBtn = document.createElement('button')
-    cancelBtn.setAttribute("class","layui-btn layui-btn-sm layui-btn-radius layui-btn-danger")
-    cancelBtn.setAttribute("onclick","cancelShareLink("+shareLink.shareLogId+")")
+    cancelBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-danger")
+    cancelBtn.setAttribute("onclick", "cancelShareLink(" + shareLink.shareLogId + ")")
     cancelBtn.innerHTML = "取销链接"
     operationBtn.appendChild(cancelBtn)
 
@@ -220,6 +233,60 @@ function createFileShareLinkTableRow(shareLink){
 }
 
 
-function cancelShareLink(shareLogId){
-    alertConfirmTrans("取消链接")
+function cancelShareLink(shareLogId) {
+    $.ajax({
+        url: "cancelShareLink.ajax",
+        data: {
+            "shareLogId": shareLogId
+        },
+        success: function (result) {
+            result = JSON.parse(result);
+            alertConfirmTrans(result["message"], 1000);
+            initFileShareLinkListHtml();
+        },
+        error: function (result) {
+            alertConfirmTrans("操作失败")
+        }
+    })
+
+}
+
+//
+function copyAllShareLink() {
+    let content = "";
+    let tbody = document.getElementById("fileShareLink_tbody");
+    const checkboxes = tbody.querySelectorAll("input[type=\"checkbox\"]");
+    for(let checkbox of checkboxes){
+        if(checkbox.checked){
+            content = content + document.getElementById("shareblock" + checkbox.getAttribute("value")).innerText + " \n";
+        }
+    }
+    copyToClipBord(content)
+    alertConfirmTrans("链接已复制")
+}
+
+function cancelAllShareLink() {
+    let shareLogIdList = [];
+    let tbody = document.getElementById("fileShareLink_tbody");
+    const checkboxes = tbody.querySelectorAll("input[type=\"checkbox\"]");
+    for(let checkbox of checkboxes){
+        if(checkbox.checked){
+            shareLogIdList.push(parseInt(checkbox.getAttribute("value")))
+        }
+    }
+
+    $.ajax({ // 一次请求
+        url: "cancelAllShareLink.ajax",
+        data: {
+            "shareLogIdList": shareLogIdList
+        },
+        success: function (result) {
+            result = JSON.parse(result);
+            alertConfirmTrans(result["message"], 1000);
+            initFileShareLinkListHtml();
+        },
+        error: function (result) {
+            alertConfirmTrans("操作失败")
+        }
+    })
 }

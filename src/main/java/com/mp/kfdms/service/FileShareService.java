@@ -64,15 +64,15 @@ public class FileShareService {
                     shareLog.setFileName(folderById.getFolder_name());
                 }
                 // 文件存在，则先创建记录
-                if (fileShareMapper.addShareLog(shareLog) > 0){
+                if (fileShareMapper.addShareLog(shareLog) > 0) {
                     // 创建加密网址
                     String shareLink = FileShareUtil.createShareLink(shareLog);
                     if (shareLink != null) {
                         // TODO: 2021/2/24 服务器地址自动获取
-                        shareLink = "localhost:8080/DataCloud/s/"+shareLink;
+                        shareLink = "localhost:8080/DataCloud/s/" + shareLink;
                         shareLog.setStatus(FileShareShareLogStatusEnum.SHARING.ordinal());
                         shareLog.setShareLink(shareLink);
-                        if (fileShareMapper.updateShareLog(shareLog) > 0){
+                        if (fileShareMapper.updateShareLog(shareLog) > 0) {
                             jsonModel.setMessage("success");
                             jsonModel.put("shareLink", shareLink);
                             jsonModel.put("accessCode", shareLog.getAccessCode());
@@ -143,12 +143,37 @@ public class FileShareService {
     public JsonModel getShareLinkList(User currentUser) {
         JsonModel jsonModel = new JsonModel();
         currentUser = userMapper.findOneByEmail(currentUser);
-        if(currentUser != null){
+        if (currentUser != null) {
             List<FileShareShareLog> shareLinkList = fileShareMapper.getShareLogByUserId(currentUser.getId());
             jsonModel.setData(shareLinkList);
             return jsonModel;
         }
         jsonModel.setMessage("error");
+        return jsonModel;
+    }
+
+    public JsonModel cancelShareLink(User currentUser, int shareLogId) {
+        JsonModel jsonModel = new JsonModel();
+        if (currentUser == null) { // 用户权限检验
+            jsonModel.setMessage("用户无权限");
+        }
+        FileShareShareLog shareLogById = fileShareMapper.getShareLogById(shareLogId);
+        if (shareLogById != null) {
+            shareLogById.setStatus(FileShareShareLogStatusEnum.DELETE.ordinal());
+            shareLogById.setDeleteTime(new Date());
+            if (fileShareMapper.updateShareLog(shareLogById) > 0) {
+                jsonModel.setMessage("链接已删除");
+            }
+        }
+        return jsonModel;
+    }
+
+    public JsonModel cancelAllShareLink(User currentUser, List<Integer> shareLogIdList) {
+        JsonModel jsonModel = new JsonModel();
+        for (int shareLogId : shareLogIdList) {
+            cancelShareLink(currentUser, shareLogId);
+        }
+        jsonModel.setMessage("已取消全部链接");
         return jsonModel;
     }
 }

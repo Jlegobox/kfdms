@@ -11,10 +11,13 @@ import com.mp.kfdms.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author J
@@ -49,5 +52,19 @@ public class DataCloudShareController {
     public String getShareLinkList(@CurrentUser final User currentUser){
         JsonModel shareLinkList = fileShareService.getShareLinkList(currentUser);
         return GsonUtil.instance().toJson(shareLinkList);
+    }
+
+    @RequestMapping("cancelShareLink.ajax")
+    @ResponseBody
+    public String cancelShareLink(@CurrentUser final User currentUser, int shareLogId){
+        JsonModel jsonModel = fileShareService.cancelShareLink(currentUser,shareLogId);
+        return GsonUtil.instance().toJson(jsonModel);
+    }
+
+    @RequestMapping("cancelAllShareLink.ajax")
+    @ResponseBody
+    public String cancelShareLink(@CurrentUser final User currentUser, @RequestParam(value = "shareLogIdList[]", defaultValue = "0") List<Integer> shareLogIdList){
+        JsonModel jsonModel = fileShareService.cancelAllShareLink(currentUser,shareLogIdList);
+        return GsonUtil.instance().toJson(jsonModel);
     }
 }

@@ -615,3 +615,12 @@ function datacloud_close_refresh() {
     // 找到父类的document再去找刷新按钮
     parent.document.getElementById("fileDeskRefresh").click();
 }
+
+function changeAllCheckBox(headerCheckBoxId){
+    let checkedStatus = document.getElementById(headerCheckBoxId).checked;
+    let tbody = document.getElementById("fileShareLink_tbody");
+    const checkboxes = tbody.querySelectorAll("input[type=\"checkbox\"]");
+    for(let checkbox of checkboxes){
+        checkbox.checked = checkedStatus;
+    }
+}
