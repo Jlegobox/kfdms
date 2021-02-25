@@ -83,6 +83,12 @@ function sendLoginInfo(encryptedData){
             switch (data){
                 case "success":
                     sessionStorage['lg_token'] = xhr.getResponseHeader('lg_token');
+                    // 前页是系统内页面，则回退
+                    // let referrerUrl = document.referrer;
+                    // if(referrerUrl.startsWith("localhost:8080"))
+                    //     history.go(-1);
+
+                    // 另一种发请求方式
                     // var new_xhr = new XMLHttpRequest();
                     // new_xhr.open('GET',"home.html")
                     // new_xhr.setRequestHeader('lg_token',sessionStorage['lg_token'])

@@ -12,16 +12,11 @@ import com.mp.kfdms.mapper.UserMapper;
 import com.mp.kfdms.pojo.FileShareLinkInfo;
 import com.mp.kfdms.pojo.FolderView;
 import com.mp.kfdms.pojo.JsonModel;
-import com.mp.kfdms.util.FileShareUtil;
-import com.mp.kfdms.util.GsonUtil;
-import com.mp.kfdms.util.UserUtil;
+import com.mp.kfdms.util.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author J
@@ -85,7 +80,25 @@ public class FileShareService {
         return jsonModel;
     }
 
-    public String checkShareLink(User currentUser, String shareLink, String accessCode) {
+    public JsonModel checkShareLink(User currentUser, String shareLinkData) {
+        JsonModel jsonModel = new JsonModel();
+        if (currentUser == null) { // 未登录，没有权限进入
+            jsonModel.setMessage("userAuthError");
+            return jsonModel;
+        }
+        String shareLink = null;
+        String accessCode = null;
+        try {
+            String dncryption = RSAKeyUtil.dncryption(shareLinkData, RSAKeyUtil.getPrivateKey());
+            Map map = GsonUtil.instance().fromJson(dncryption, Map.class);
+            shareLink = (String) map.get("shareLink");
+            accessCode = (String) map.get("accessCode");
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonModel.setMessage("userAuthError");
+            return jsonModel;
+        }
+
         int logId = FileShareUtil.decodeShareLink(shareLink, accessCode);
         if (logId != -1) { // 解密获得了logId
             int updateFlag = 0;
@@ -94,28 +107,54 @@ public class FileShareService {
                 FileShareShareLog shareLog = fileShareMapper.getShareLogById(logId);
                 if (shareLog != null && shareLog.getStatus() == FileShareShareLogStatusEnum.SHARING.ordinal()) { // 链接为分享中
                     Date now = new Date();
-                    if (now.compareTo(shareLog.getExpiredTime()) < 0) { // 未失效
+                    if (shareLog.getExpiredTime() == null || now.compareTo(shareLog.getExpiredTime()) < 0) { // 未失效
                         // 更新访问次数
                         int visitNum = shareLog.getVisitNum() + 1;
                         if (shareLog.getVisitLimit() != -1 && visitNum > shareLog.getVisitLimit()) { // 是否超限，前端做验证。后端处理多线程情况
-                            return "exceed_limit";
+                            jsonModel.setMessage("exceedLimit");
+                            return jsonModel;
                         }
                         shareLog.setVisitNum(visitNum);
                         // 使用版本号实现乐观锁
                         if (fileShareMapper.updateShareLog(shareLog) > 0) { // 更新成功
-                            return getShareView(shareLog);
+                            jsonModel.setData(getEncodeShareCode(currentUser, shareLog));
+                            return jsonModel;
                         }
                     } else {
                         // 失效更新状态
                         shareLog.setStatus(FileShareShareLogStatusEnum.EXPIRED.ordinal());
                         fileShareMapper.updateShareLog(shareLog);
-                        return "expired";
+                        jsonModel.setMessage("expired");
+                        return jsonModel;
                     }
                 }
             }
 
         }
-        return "error";
+        return jsonModel;
+    }
+
+    /**
+     * 根据shareLink,accessCode以及用户email确定确实获得了权限
+     *
+     * @param shareLog
+     * @return
+     */
+    public String getEncodeShareCode(User currentUser, FileShareShareLog shareLog) {
+        String code = null;
+        try {
+            HashMap<String, String> codeMap = new HashMap<>();
+            codeMap.put("shareLink", shareLog.getShareLink());
+            codeMap.put("accessCode", shareLog.getAccessCode());
+            codeMap.put("userEmail", currentUser.getEmail());
+            codeMap.put("checkTime", String.valueOf(Calendar.getInstance().getTimeInMillis()));
+            // RSA加密不能超过117bytes，需要分选
+//            code = RSAKeyUtil.encryption(codeMap.toString(), RSAKeyUtil.getPublicKey());
+            code = AESUtil.encodeBase64(codeMap.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return code;
     }
 
     public String getShareView(FileShareShareLog shareLog) {

@@ -67,4 +67,11 @@ public class DataCloudShareController {
         JsonModel jsonModel = fileShareService.cancelAllShareLink(currentUser,shareLogIdList);
         return GsonUtil.instance().toJson(jsonModel);
     }
+
+    @RequestMapping("checkShareLink.ajax")
+    @ResponseBody
+    public String checkShareLink(@CurrentUser final User currentUser, final String shareLinkData){
+        JsonModel jsonModel = fileShareService.checkShareLink(currentUser, shareLinkData);
+        return GsonUtil.instance().toJson(jsonModel);
+    }
 }

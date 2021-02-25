@@ -125,7 +125,7 @@ function initFileShareLinkListHtml() {
     });
 
     // 表格全选事件
-    document.getElementById("headerCheckBox").addEventListener('click',function (){
+    document.getElementById("headerCheckBox").addEventListener('click', function () {
         changeAllCheckBox("headerCheckBox");
     })
 
@@ -256,8 +256,8 @@ function copyAllShareLink() {
     let content = "";
     let tbody = document.getElementById("fileShareLink_tbody");
     const checkboxes = tbody.querySelectorAll("input[type=\"checkbox\"]");
-    for(let checkbox of checkboxes){
-        if(checkbox.checked){
+    for (let checkbox of checkboxes) {
+        if (checkbox.checked) {
             content = content + document.getElementById("shareblock" + checkbox.getAttribute("value")).innerText + " \n";
         }
     }
@@ -266,11 +266,12 @@ function copyAllShareLink() {
 }
 
 function cancelAllShareLink() {
+
     let shareLogIdList = [];
     let tbody = document.getElementById("fileShareLink_tbody");
     const checkboxes = tbody.querySelectorAll("input[type=\"checkbox\"]");
-    for(let checkbox of checkboxes){
-        if(checkbox.checked){
+    for (let checkbox of checkboxes) {
+        if (checkbox.checked) {
             shareLogIdList.push(parseInt(checkbox.getAttribute("value")))
         }
     }
@@ -287,6 +288,72 @@ function cancelAllShareLink() {
         },
         error: function (result) {
             alertConfirmTrans("操作失败")
+        }
+    })
+}
+
+// 获得拼接的url参数(简单)
+function getUrlParam(url){
+    let split = url.split(".html?")
+    let paramStr = split[split.length - 1].split("&");
+    let paramMap = {}
+    for (let i = 0; i < paramStr.length; i++) {
+        let temParam = paramStr[i].split("=");
+        paramMap[temParam[0]] = temParam[1]
+    }
+    return paramMap;
+}
+
+function checkShareLink() {
+    if(sessionStorage["lg_token"] == null || sessionStorage["lg_token"] === "undefined"){
+        // 方案一
+        x_admin_show("用户登录","/login.html",600,600);
+        // 方案二 由login的请求回退到这里
+        // location.href = "/login.html";
+        return ;
+    }
+    let paramMap= getUrlParam(location.href);
+    $.ajax({
+        url:'/Login/getPublicKey',
+        type:'POST',
+        data:{},
+        dataType:'text',
+        success:function (result){
+            let publicKeyInfo = eval("("+result+")");
+            // 校验publicKey的时间
+            let encrypt = new JSEncrypt();
+            encrypt.setPublicKey(publicKeyInfo.publicKey);
+            let content = "{shareLink:\"" + paramMap["shareLink"]+"\",accessCode:\"" + $("#accessCode").val()+"\"}"
+            let encryptedContent = encrypt.encrypt(content);
+            docheckShareLink(encryptedContent);
+        },
+        error:function (result){
+            alert("请求失败！")
+        }
+    })
+}
+
+function docheckShareLink(data){
+    $.ajax({
+        url:"checkShareLink.ajax",
+        type:"POST",
+        beforeSend:function (xhr){
+            xhr.setRequestHeader("lg_token",sessionStorage['lg_token'])
+        },
+        data:{
+            shareLinkData:data
+        },
+        success:function (result){
+            result = JSON.parse(result);
+            if(result["data"] == null || result["data"] === "undefined"){
+                x_admin_show("用户登录","/login.html",600,600);
+                return ;
+            }
+            location.href = "/DataCloud/Share/FileShareFileList.html?AuthCode=" + result["data"];
+        },
+        error:function (result){
+            result = JSON.parse(result);
+            alert(result.message)
         }
     })
 }

@@ -17,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -208,6 +209,13 @@ public class DataCloudController {
     @RequestMapping("/completeUploadFile.ajax")
     public String completeUploadFile(final HttpServletRequest request, final int folderId){
         return fileService.completeUploadFile(request, folderId);
+    }
+
+    @RequestMapping("/s/{shareLink}")
+    public String turnToCheckShareLink(HttpServletResponse response, @PathVariable String shareLink) throws IOException {
+        // TODO: 2021/2/25 了解多种重定向带参方式
+        response.sendRedirect("/DataCloud/Share/checkShareLink.html?shareLink="+shareLink);
+        return "success";
     }
 
 }
