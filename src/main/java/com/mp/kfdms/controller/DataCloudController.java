@@ -214,7 +214,7 @@ public class DataCloudController {
     @RequestMapping("/s/{shareLink}")
     public String turnToCheckShareLink(HttpServletResponse response, @PathVariable String shareLink) throws IOException {
         // TODO: 2021/2/25 了解多种重定向带参方式
-        response.sendRedirect("/DataCloud/Share/checkShareLink.html?shareLink="+shareLink);
+        response.sendRedirect("/DataCloud/Share/CheckShareLink.html?shareLink="+shareLink);
         return "success";
     }
 
