@@ -39,19 +39,9 @@
 
 </div>
 <div class="x-body">
-    <!--      <div class="layui-row">-->
-    <!--        <form class="layui-form layui-col-md12 x-so">-->
-    <!--          <input class="layui-input"  autocomplete="off" placeholder="开始日" name="start" id="start">-->
-    <!--          <input class="layui-input"  autocomplete="off" placeholder="截止日" name="end" id="end">-->
-    <!--          <input type="text" name="username"  placeholder="请输入用户名" autocomplete="off" class="layui-input">-->
-    <!--          <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>-->
-    <!--        </form>-->
-    <!--      </div>-->
     <xblock>
-        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
-        <button class="layui-btn layui-btn-danger" id="uploadMultiFile"><i class="layui-icon layui-icon-upload-circle"></i>批量上传</button>
-        <button class="layui-btn" onclick="x_admin_show('新建文件夹','./folder-add.html',600,400)"><i class="layui-icon layui-icon-file"></i>新建文件夹</button>
-        <button class="layui-btn" onclick="x_admin_show('上传文件','./file-add.html',600,400)"><i class="layui-icon layui-icon-upload-circle"></i>上传文件</button>
+        <button class="layui-btn layui-btn-normal" type="button" onclick="alertConfirmTrans('功能未完善',2000)">保存到云盘</button>
+        <button class="layui-btn layui-btn-normal" type="button" onclick="alertConfirmTrans('功能未完善',2000)">下载</button>
     </xblock>
     <table class="layui-table x-admin" id="folder_desk">
         <thead>
