@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="x-admin-sm">
 <head>
     <meta charset="UTF-8">
     <title>文件分享：</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <!--    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />-->
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
     <link rel="stylesheet" href="../../css/font.css">
     <link rel="stylesheet" href="../../css/xadmin.css">
     <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
@@ -17,28 +17,40 @@
     <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <!--boostrap-->
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
     <script src="../../js/datacloud/datacloud.js"></script>
 </head>
 <body>
 <!--目前仅展示单个文件的下载路口，未来增加可以查看文件夹内文件，分开下载和保存在自己账户的功能的功能 -->
-<div class="x-nav" >
-    <button id="upperlayerBtn" type="button" class="layui-btn">上一级</button>
-    <span id="fileDeskNavigation" class="layui-breadcrumb" lay-separator="/" style="font-size: 20px"> <!--面包屑有BUG，不使用class="layui-breadcrumb" lay-separator="/"-->
-        <a>root</a>
-      </span>
-    <span style="float: right">
-        <span id="synTime"></span>
-      <button id="fileDeskRefresh" type="button" class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px"
-              href="" onclick="refreshFileDesk(deskFolderId);" title="刷新">
-        <i class="layui-icon layui-icon-refresh"></i></button>
-      </span>
+    <div class="container">
+        <div class="logo"><a href="../../home.html">KFDMS</a></div>
+        <ul class="layui-nav left fast-add" lay-filter="">
+            <li class="layui-nav-item">
+                <a href="javascript:;">+新增</a>
+                <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                    <dd><a onclick="x_admin_show('资讯','https://www.baidu.com')"><i class="iconfont">&#xe6a2;</i>资讯</a></dd>
+                    <dd><a onclick="x_admin_show('图片','https://www.baidu.com')"><i class="iconfont">&#xe6a8;</i>图片</a></dd>
+                    <dd><a onclick="x_admin_show('用户 最大化','https://www.baidu.com','','',true)"><i class="iconfont">&#xe6b8;</i>用户最大化</a></dd>
+                    <dd><a onclick="x_admin_add_to_tab('在tab打开','https://www.baidu.com',true)"><i class="iconfont">&#xe6b8;</i>在tab打开</a></dd>
+                </dl>
+            </li>
+        </ul>
+        <ul class="layui-nav right" lay-filter="">
+            <li class="layui-nav-item">
+                <a href="javascript:;">admin</a>
+                <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                    <dd><a onclick="x_admin_show('个人信息','http://www.baidu.com')">个人信息</a></dd>
+                    <dd><a onclick="x_admin_show('切换帐号','http://www.baidu.com')">切换帐号</a></dd>
+                    <dd><a href="./login.html">退出</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item to-index"><a href="/">前台首页</a></li>
+        </ul>
 
-</div>
-<div class="x-body">
+    </div>
+<!--<ul class="layui-nav layui-bg-cyan">-->
+<!--    <li class="layui-nav-item"><a href="/home.html">KFDMS</a></li>-->
+<!--</ul>-->
+    <div class="x-body">
     <xblock>
         <button class="layui-btn layui-btn-normal" type="button" onclick="alertConfirmTrans('功能未完善',2000)">保存到云盘</button>
         <button class="layui-btn layui-btn-normal" type="button" onclick="alertConfirmTrans('功能未完善',2000)">下载</button>

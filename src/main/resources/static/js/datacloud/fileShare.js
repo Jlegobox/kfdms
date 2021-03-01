@@ -325,7 +325,7 @@ function checkShareLink() {
             encrypt.setPublicKey(publicKeyInfo.publicKey);
             let content = "{shareLink:\"" + paramMap["shareLink"]+"\",accessCode:\"" + $("#accessCode").val()+"\"}"
             let encryptedContent = encrypt.encrypt(content);
-            docheckShareLink(encryptedContent);
+            doCheckShareLink(encryptedContent);
         },
         error:function (result){
             alert("请求失败！")
@@ -333,7 +333,7 @@ function checkShareLink() {
     })
 }
 
-function docheckShareLink(data){
+function doCheckShareLink(data){
     $.ajax({
         url:"checkShareLink.ajax",
         type:"POST",
@@ -349,11 +349,33 @@ function docheckShareLink(data){
                 x_admin_show("用户登录","/login.html",600,600);
                 return ;
             }
-            location.href = "/DataCloud/Share/FileShareFileList.html?AuthCode=" + result["data"];
+            location.href = "/DataCloud/Share/FileShareFileDesk.html?AuthCode=" + result["data"];
         },
         error:function (result){
             result = JSON.parse(result);
             alert(result.message)
         }
     })
+}
+
+
+function initFileShareFileDesk(){
+    let authCode = getUrlParam(location.href)["AuthCode"];
+    $.ajax({
+        url:"DataCloud/Share/getSharedFile.ajax",
+        type:"POST",
+        data:{
+            "authCode":authCode
+        },
+        success:function (result){
+            loadFileShareFile();
+        },
+        error:function (result){
+            alertConfirmTrans(result,2000)
+        }
+    })
+}
+
+function loadFileShareFile(){
+
 }

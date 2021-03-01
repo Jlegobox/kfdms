@@ -8,6 +8,7 @@ package com.mp.kfdms.util;
  */
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * json工具类，基于gson
@@ -18,7 +19,8 @@ public class GsonUtil {
     public static Gson instance(){
         if(instance == null){
             synchronized (GsonUtil.class){
-                instance = new Gson();
+                // 开启
+                instance = new GsonBuilder().enableComplexMapKeySerialization().create();
             }
         }
         return instance;

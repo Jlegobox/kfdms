@@ -1,5 +1,7 @@
 package com.mp.kfdms.service;
 
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.mp.kfdms.domain.FileNode;
 import com.mp.kfdms.domain.FileShareShareLog;
 import com.mp.kfdms.domain.Folder;
@@ -13,9 +15,12 @@ import com.mp.kfdms.pojo.FileShareLinkInfo;
 import com.mp.kfdms.pojo.FolderView;
 import com.mp.kfdms.pojo.JsonModel;
 import com.mp.kfdms.util.*;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -26,6 +31,8 @@ import java.util.*;
  */
 @Service
 public class FileShareService {
+    static long ACCESS_TIME = 60000000;
+
     @Resource
     private FileShareMapper fileShareMapper;
 
@@ -144,39 +151,17 @@ public class FileShareService {
         String code = null;
         try {
             HashMap<String, String> codeMap = new HashMap<>();
-            codeMap.put("shareLink", shareLog.getShareLink());
+            codeMap.put("shareLogId", String.valueOf(shareLog.getShareLogId()));
             codeMap.put("accessCode", shareLog.getAccessCode());
             codeMap.put("userEmail", currentUser.getEmail());
             codeMap.put("checkTime", String.valueOf(Calendar.getInstance().getTimeInMillis()));
             // RSA加密不能超过117bytes，需要分选
 //            code = RSAKeyUtil.encryption(codeMap.toString(), RSAKeyUtil.getPublicKey());
-            code = AESUtil.encodeBase64(codeMap.toString());
+            code = AESUtil.encodeBase64(GsonUtil.instance().toJson(codeMap));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return code;
-    }
-
-    public String getShareView(FileShareShareLog shareLog) {
-        FolderView folderView = new FolderView();
-        if (shareLog.getFolderId() != -1) {
-            Folder folderById = folderMapper.getFolderById(shareLog.getFolderId());
-            ArrayList<Folder> folders = new ArrayList<>();
-            ArrayList<String> foldersPermission = new ArrayList<>();
-            foldersPermission.add("a");
-            folders.add(folderById);
-            folderView.setFolders(folders);
-            folderView.setFoldersPermission(foldersPermission);
-        }
-        if (shareLog.getFileId() != -1) {
-            FileNode fileById = fileNodeMapper.getFileById(shareLog.getFileId());
-            ArrayList<FileNode> fileNodes = new ArrayList<>();
-            ArrayList<String> fileNodesPermission = new ArrayList<>();
-            fileNodes.add(fileById);
-            folderView.setFiles(fileNodes);
-            folderView.setFilesPermission(fileNodesPermission);
-        }
-        return GsonUtil.instance().toJson(folderView);
     }
 
     public JsonModel getShareLinkList(User currentUser) {
@@ -214,5 +199,57 @@ public class FileShareService {
         }
         jsonModel.setMessage("已取消全部链接");
         return jsonModel;
+    }
+
+    public JsonModel getSharedFile(String authCode) {
+        JsonModel jsonModel = new JsonModel();
+        // 从authCode获取必要信息
+        try{
+            String decodedShareCode = AESUtil.decodeBase64(authCode);
+            Type type = new TypeToken<Map<String, String>>() {
+            }.getType();
+            Map<String, String> EncodeShareCodeMap = GsonUtil.instance().fromJson(decodedShareCode, type);
+            int shareLogId = Integer.parseInt(EncodeShareCodeMap.get("shareLogId"));
+            String accessCode = EncodeShareCodeMap.get("accessCode");
+            String userEmail = EncodeShareCodeMap.get("userEmail");
+            String checkTime = EncodeShareCodeMap.get("checkTime");
+            // 检验验证时间
+            if (Calendar.getInstance().getTimeInMillis() - Long.parseLong(checkTime) > ACCESS_TIME){
+                jsonModel.setMessage("code_expired");
+                return jsonModel;
+            }
+
+            // 获得信息
+            FileShareShareLog shareLogById = fileShareMapper.getShareLogById(shareLogId);
+            FolderView shareView = getShareView(shareLogById);
+            jsonModel.setData(shareView);
+            return jsonModel;
+        }catch (Exception e){
+            e.printStackTrace();
+            jsonModel.setMessage("error");
+            return jsonModel;
+        }
+    }
+
+    public FolderView getShareView(FileShareShareLog shareLog) {
+        FolderView folderView = new FolderView();
+        if (shareLog.getFolderId() != -1) {
+            Folder folderById = folderMapper.getFolderById(shareLog.getFolderId());
+            ArrayList<Folder> folders = new ArrayList<>();
+            ArrayList<String> foldersPermission = new ArrayList<>();
+            foldersPermission.add("a");
+            folders.add(folderById);
+            folderView.setFolders(folders);
+            folderView.setFoldersPermission(foldersPermission);
+        }
+        if (shareLog.getFileId() != -1) {
+            FileNode fileById = fileNodeMapper.getFileById(shareLog.getFileId());
+            ArrayList<FileNode> fileNodes = new ArrayList<>();
+            ArrayList<String> fileNodesPermission = new ArrayList<>();
+            fileNodes.add(fileById);
+            folderView.setFiles(fileNodes);
+            folderView.setFilesPermission(fileNodesPermission);
+        }
+        return folderView;
     }
 }
