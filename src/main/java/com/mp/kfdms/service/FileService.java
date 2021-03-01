@@ -111,7 +111,7 @@ public class FileService {
         return "success";
     }
 
-    public String downloadFile(HttpServletRequest request, final HttpServletResponse response, int fileId) throws IOException {
+    public String downloadFile(final HttpServletRequest request, final HttpServletResponse response, int fileId) throws IOException {
         FileNode fileNode = null;
         try{
             fileNode = fileNodeMapper.getFileById(fileId);

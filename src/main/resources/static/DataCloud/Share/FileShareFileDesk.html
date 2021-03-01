@@ -18,22 +18,13 @@
     <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
     <script src="../../js/datacloud/datacloud.js"></script>
+    <script src="../../js/datacloud/fileShare.js"></script>
+    <script src="../../js/kfdms-notice.js"></script>
 </head>
 <body>
 <!--目前仅展示单个文件的下载路口，未来增加可以查看文件夹内文件，分开下载和保存在自己账户的功能的功能 -->
     <div class="container">
         <div class="logo"><a href="../../home.html">KFDMS</a></div>
-        <ul class="layui-nav left fast-add" lay-filter="">
-            <li class="layui-nav-item">
-                <a href="javascript:;">+新增</a>
-                <dl class="layui-nav-child"> <!-- 二级菜单 -->
-                    <dd><a onclick="x_admin_show('资讯','https://www.baidu.com')"><i class="iconfont">&#xe6a2;</i>资讯</a></dd>
-                    <dd><a onclick="x_admin_show('图片','https://www.baidu.com')"><i class="iconfont">&#xe6a8;</i>图片</a></dd>
-                    <dd><a onclick="x_admin_show('用户 最大化','https://www.baidu.com','','',true)"><i class="iconfont">&#xe6b8;</i>用户最大化</a></dd>
-                    <dd><a onclick="x_admin_add_to_tab('在tab打开','https://www.baidu.com',true)"><i class="iconfont">&#xe6b8;</i>在tab打开</a></dd>
-                </dl>
-            </li>
-        </ul>
         <ul class="layui-nav right" lay-filter="">
             <li class="layui-nav-item">
                 <a href="javascript:;">admin</a>
@@ -53,58 +44,28 @@
     <div class="x-body">
     <xblock>
         <button class="layui-btn layui-btn-normal" type="button" onclick="alertConfirmTrans('功能未完善',2000)">保存到云盘</button>
-        <button class="layui-btn layui-btn-normal" type="button" onclick="alertConfirmTrans('功能未完善',2000)">下载</button>
+        <button id="downloadBtn" class="layui-btn layui-btn-normal" type="button" onclick="downloadSharedFile()">下载</button>
     </xblock>
-    <table class="layui-table x-admin" id="folder_desk">
-        <thead>
-        <tr>
-            <th>
-                <div class="layui-unselect gheader layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
-            </th>
-            <th>名称</th>
-            <th>文件类型</th>
-            <th>共享类型</th>
-            <th>修改时间</th>
-            <th>大小</th>
-            <th>描述</th>
-            <th>操作</th>
-        </tr>
-        </thead>
-        <tbody id="file_desk_tbody">
-        <tr>
-            <td>
-                <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i class="layui-icon">&#xe605;</i></div>
-            </td>
-            <td>t</td>
-            <td>小明</td>
-            <td>男</td>
-            <td>13000000000</td>
-            <td>2017-01-01 11:11:42</td>
-            <td class="td-status">
-                <span class="layui-btn layui-btn-normal layui-btn-mini">已启用</span></td>
-            <td class="td-manage">
-                <div class="layui-btn-group">
-                    <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal">下载</button>
-                    <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-normal">分享</button>
-                    <button class="layui-btn layui-btn-sm layui-btn-radius layui-btn-disabled">预览</button>
-                    <div class="btn-group">
-                        <button type="button" class="layui-btn layui-btn-normal" data-toggle="dropdown">更多
-                        </button>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a onclick="alert('功能')">功能</a></li>
-                            <li><a href="#">另一个功能</a></li>
-                            <li><a href="#">其他</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">分离的链接</a></li>
-                        </ul>
+        <table class="layui-table x-admin" id="fileShareLinkListTable">
+            <thead>
+            <tr>
+                <th>
+                    <div style='text-align: center'>
+                        <input id="headerCheckBox" class='layui-form-checkbox' lay-skin='primary'  type='checkbox'>
                     </div>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                </th>
+                <th>分享文件</th>
+                <th>分享时间</th>
+                <th>失效时间</th>
+                <th>访问次数</th>
+                <th>访问上限</th>
+            </tr>
+            </thead>
+            <tbody id="fileShareLink_tbody">
 
-</div>
+            </tbody>
+        </table>
+    </div>
 <script>
     initFileShareFileDesk()
 </script>

@@ -15,11 +15,14 @@ import com.mp.kfdms.pojo.FileShareLinkInfo;
 import com.mp.kfdms.pojo.FolderView;
 import com.mp.kfdms.pojo.JsonModel;
 import com.mp.kfdms.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -31,7 +34,11 @@ import java.util.*;
  */
 @Service
 public class FileShareService {
+    // authCode的有效持续时间
     static long ACCESS_TIME = 60000000;
+
+    @Autowired
+    private FileService fileService;
 
     @Resource
     private FileShareMapper fileShareMapper;
@@ -221,8 +228,10 @@ public class FileShareService {
 
             // 获得信息
             FileShareShareLog shareLogById = fileShareMapper.getShareLogById(shareLogId);
-            FolderView shareView = getShareView(shareLogById);
-            jsonModel.setData(shareView);
+            // TODO: 2021/3/1 返回文件信息用于更丰富的展示
+//            FolderView shareView = getShareView(shareLogById);
+            // 目前只返回shareLog
+            jsonModel.setData(shareLogById);
             return jsonModel;
         }catch (Exception e){
             e.printStackTrace();
@@ -251,5 +260,35 @@ public class FileShareService {
             folderView.setFilesPermission(fileNodesPermission);
         }
         return folderView;
+    }
+
+    public String downloadSharedFile(User currentUser, HttpServletRequest request, HttpServletResponse response, String authCode, int shareLogId) {
+        JsonModel jsonModel = new JsonModel();
+        // 从authCode获取必要信息
+        try {
+            String decodedShareCode = AESUtil.decodeBase64(authCode);
+            Type type = new TypeToken<Map<String, String>>() {
+            }.getType();
+            Map<String, String> EncodeShareCodeMap = GsonUtil.instance().fromJson(decodedShareCode, type);
+            String userEmail = EncodeShareCodeMap.get("userEmail");
+            String checkTime = EncodeShareCodeMap.get("checkTime");
+            // 检验验证时间
+            if (Calendar.getInstance().getTimeInMillis() - Long.parseLong(checkTime) > ACCESS_TIME) {
+                return "code_expired";
+            }
+            // 检查权限
+            if(currentUser!=null && currentUser.getEmail().equals(userEmail)){
+                FileShareShareLog shareLog = fileShareMapper.getShareLogById(shareLogId);
+                if(shareLog.getFolderId()!=-1){
+                    return "folder";
+                }
+                // 下载需要从前端重新起一个请求
+                return String.valueOf(shareLog.getFileId());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return "error";
+        }
+        return "error";
     }
 }

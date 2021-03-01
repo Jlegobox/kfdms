@@ -176,7 +176,13 @@ function loadFileShareLinkList(shareLinkList) {
 
 function createFileShareLinkTableRow(shareLink) {
     let row = document.createElement('tr');
+    row = createFileShareLinkListFileInfo(row,shareLink);
+    let operationBtn = createFileShareLinkListBtn(shareLink);
+    row.appendChild(operationBtn)
+    return row;
+}
 
+function createFileShareLinkListFileInfo(row,shareLink){
     let checkBox = document.createElement('td');
     // value 储存shareLogId
     checkBox.innerHTML = "<div style='text-align: center'><input value=" + shareLink.shareLogId + " class='layui-form-checkbox' lay-skin='primary'  type='checkbox'></div>"
@@ -208,13 +214,16 @@ function createFileShareLinkTableRow(shareLink) {
     } else {
         visitLimit.innerText = shareLink.visitLimit;
     }
-    row.appendChild(visitLimit)
+    row.appendChild(visitLimit);
+    return row;
+}
 
+function createFileShareLinkListBtn(shareLink){
     // 构造操作按钮
     let operationBtn = document.createElement('td');
     // operationBtn.setAttribute("class","layui-btn-group")
-    let copyBtn = document.createElement('button')
-    copyBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
+    let copyBtn = document.createElement('button');
+    copyBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal");
     copyBtn.addEventListener('click', function () {
         let content = getShareMessage(shareLink.shareLink, shareLink.accessCode);
         copyToClipBord(content);
@@ -222,14 +231,12 @@ function createFileShareLinkTableRow(shareLink) {
     })
     copyBtn.innerText = "复制链接"
     operationBtn.appendChild(copyBtn);
-    let cancelBtn = document.createElement('button')
-    cancelBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-danger")
-    cancelBtn.setAttribute("onclick", "cancelShareLink(" + shareLink.shareLogId + ")")
-    cancelBtn.innerHTML = "取销链接"
-    operationBtn.appendChild(cancelBtn)
-
-    row.appendChild(operationBtn)
-    return row;
+    let cancelBtn = document.createElement('button');
+    cancelBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-danger");
+    cancelBtn.setAttribute("onclick", "cancelShareLink(" + shareLink.shareLogId + ")");
+    cancelBtn.innerHTML = "取销链接";
+    operationBtn.appendChild(cancelBtn);
+    return operationBtn;
 }
 
 
@@ -293,7 +300,7 @@ function cancelAllShareLink() {
 }
 
 // 获得拼接的url参数(简单)
-function getUrlParam(url){
+function getUrlParam(url) {
     let split = url.split(".html?")
     let paramStr = split[split.length - 1].split("&");
     let paramMap = {}
@@ -305,53 +312,53 @@ function getUrlParam(url){
 }
 
 function checkShareLink() {
-    if(sessionStorage["lg_token"] == null || sessionStorage["lg_token"] === "undefined"){
+    if (sessionStorage["lg_token"] == null || sessionStorage["lg_token"] === "undefined") {
         // 方案一
-        x_admin_show("用户登录","/login.html",600,600);
+        x_admin_show("用户登录", "/login.html", 600, 600);
         // 方案二 由login的请求回退到这里
         // location.href = "/login.html";
-        return ;
+        return;
     }
-    let paramMap= getUrlParam(location.href);
+    let paramMap = getUrlParam(location.href);
     $.ajax({
-        url:'/Login/getPublicKey',
-        type:'POST',
-        data:{},
-        dataType:'text',
-        success:function (result){
-            let publicKeyInfo = eval("("+result+")");
+        url: '/Login/getPublicKey',
+        type: 'POST',
+        data: {},
+        dataType: 'text',
+        success: function (result) {
+            let publicKeyInfo = eval("(" + result + ")");
             // 校验publicKey的时间
             let encrypt = new JSEncrypt();
             encrypt.setPublicKey(publicKeyInfo.publicKey);
-            let content = "{shareLink:\"" + paramMap["shareLink"]+"\",accessCode:\"" + $("#accessCode").val()+"\"}"
+            let content = "{shareLink:\"" + paramMap["shareLink"] + "\",accessCode:\"" + $("#accessCode").val() + "\"}"
             let encryptedContent = encrypt.encrypt(content);
             doCheckShareLink(encryptedContent);
         },
-        error:function (result){
+        error: function (result) {
             alert("请求失败！")
         }
     })
 }
 
-function doCheckShareLink(data){
+function doCheckShareLink(data) {
     $.ajax({
-        url:"checkShareLink.ajax",
-        type:"POST",
-        beforeSend:function (xhr){
-            xhr.setRequestHeader("lg_token",sessionStorage['lg_token'])
+        url: "checkShareLink.ajax",
+        type: "POST",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("lg_token", sessionStorage['lg_token'])
         },
-        data:{
-            shareLinkData:data
+        data: {
+            shareLinkData: data
         },
-        success:function (result){
+        success: function (result) {
             result = JSON.parse(result);
-            if(result["data"] == null || result["data"] === "undefined"){
-                x_admin_show("用户登录","/login.html",600,600);
-                return ;
+            if (result["data"] == null || result["data"] === "undefined") {
+                x_admin_show("用户登录", "/login.html", 600, 600);
+                return;
             }
             location.href = "/DataCloud/Share/FileShareFileDesk.html?AuthCode=" + result["data"];
         },
-        error:function (result){
+        error: function (result) {
             result = JSON.parse(result);
             alert(result.message)
         }
@@ -359,23 +366,71 @@ function doCheckShareLink(data){
 }
 
 
-function initFileShareFileDesk(){
+function initFileShareFileDesk() {
     let authCode = getUrlParam(location.href)["AuthCode"];
     $.ajax({
-        url:"DataCloud/Share/getSharedFile.ajax",
-        type:"POST",
-        data:{
-            "authCode":authCode
+        url: "/DataCloud/Share/getSharedFile.ajax",
+        type: "POST",
+        data: {
+            "authCode": authCode
         },
-        success:function (result){
-            loadFileShareFile();
+        success: function (result) {
+            result = JSON.parse(result);
+            if (result["data"] == null || result["data"] === "undefined") {
+                alertConfirmTrans(result["message"]);
+                return;
+            }
+            loadFileShareFileDesk(result["data"]);
         },
-        error:function (result){
-            alertConfirmTrans(result,2000)
+        error: function (result) {
+            alertConfirmTrans(result, 2000)
         }
     })
 }
 
-function loadFileShareFile(){
+function loadFileShareFileDesk(shareLink) {
+    let tbody = document.getElementById("fileShareLink_tbody");
+    // 表格全选事件
+    document.getElementById("headerCheckBox").addEventListener('click', function () {
+        changeAllCheckBox("headerCheckBox");
+    })
+    tbody.innerHTML = "";
+    let row = createFileShareFileDeskTableRow(shareLink);
+    tbody.appendChild(row);
+    let downloadBtn = document.getElementById("downloadBtn");
+    downloadBtn.setAttribute("onclick","downloadSharedFile("+shareLink["shareLogId"]+")")
+}
 
+function createFileShareFileDeskTableRow(shareLink){
+    let row = document.createElement("tr");
+    row = createFileShareLinkListFileInfo(row,shareLink);
+    return row;
+}
+
+function downloadSharedFile(shareLogId){
+    let authCode = getUrlParam(location.href)["AuthCode"];
+    $.ajax({
+        url:"downloadSharedFile.ajax",
+        type:"POST",
+        data:{
+            "authCode":authCode,
+            "shareLogId":shareLogId
+        },
+        beforeSend:function (xhr){
+            xhr.setRequestHeader('lg_token',sessionStorage['lg_token'])
+        },
+        success:function (result){
+            switch (result){
+                case "folder":alertConfirmTrans("暂不能下载文件夹",2000);break;
+                case "code_expired":alertConfirmTrans("分享的文件已失效");break;
+                case "error":alertConfirmTrans("error");break;
+                default :{
+                    window.open("/DataCloud/downloadFile.do?fileId=" + result)
+                }
+            }
+        },
+        error:function (result){
+            alertConfirmTrans("error",2000);
+        }
+    })
 }
