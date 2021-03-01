@@ -21,3 +21,13 @@ function home_check_token(){
         })
     }
 }
+
+function quitAccount(){
+    // 可以加一个确认窗口
+    sessionStorage.clear();
+    location.href = "/login.html"
+}
+
+function showAccountInfo(){
+    document.getElementById("myAccountSubMenu").click();
+}
