@@ -188,16 +188,16 @@ public class UserService {
         return jsonModel;
     }
 
-    public String modifyAccountInfo(User currentUser, HttpServletRequest request){
+    public String modifyAccountInfo(User currentUser, HttpServletRequest request) {
         currentUser.setUsername(request.getParameter("username"));
         currentUser.setSex(Integer.parseInt(request.getParameter("sex")));
         currentUser.setStudent_id(request.getParameter("studentId"));
         Date date = new Date();
-        try{
+        try {
             String birthday = request.getParameter("birthday");
             SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
             date = sdf.parse(birthday);
-        }catch (ParseException e){
+        } catch (ParseException e) {
             e.printStackTrace();
         }
         currentUser.setBirthday(date);
@@ -207,5 +207,32 @@ public class UserService {
         currentUser.setVerification(request.getParameter("verification"));
         userMapper.updateUser(currentUser);
         return "success";
+    }
+
+    public String changePassword(User currentUser, String oldPass, String newPass) {
+        if (currentUser != null) {
+            if (!currentUser.getPassword().equals(oldPass)) {
+                return "原始密码错误";
+            }
+            currentUser.setPassword(newPass);
+            userMapper.changePassword(currentUser);
+            return "密码修改成功";
+        }
+        return "服务器错误";
+    }
+
+    public String eliminateAccount(User currentUser, String password) {
+        if (currentUser == null || !currentUser.getPassword().equals(password)) {
+            return "密码错误";
+        }
+        // TODO: 2021/3/2 设置标志位的方式来删除用户，并将用户的数据进行清除
+        userMapper.deleteUser(currentUser);
+        clearUser();
+        return "success";
+    }
+
+    public String clearUser() {
+        // TODO: 2021/3/2 用户表设置用户删除后，根据用户id，删除上传记录，文件分享记录等 考虑异步方式进行
+        return null;
     }
 }

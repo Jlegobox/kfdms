@@ -41,4 +41,13 @@ public class AccountController {
         return "success";
     }
 
+    @RequestMapping("/changePassword.ajax")
+    public String changePassword(@CurrentUser User currentUser,String oldPass, String newPass){
+        return userService.changePassword(currentUser,oldPass,newPass);
+    }
+
+    @RequestMapping("/eliminateAccount.ajax")
+    public String eliminateAccount(@CurrentUser User currentUser,String password){
+        return userService.eliminateAccount(currentUser,password);
+    }
 }

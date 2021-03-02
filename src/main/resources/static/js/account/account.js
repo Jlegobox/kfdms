@@ -61,3 +61,57 @@ function modifyAccountInfo() {
         }
     })
 }
+
+function changePassword(){
+    let oldPass = $("#oldPasswordStr").val();
+    let newPass = $("#newPasswordStr").val();
+    let newPass2 = $("#newPasswordStr2").val();
+    if(newPass !== newPass2){
+        alertConfirmTrans("两次密码不相同！")
+        return ;
+    }
+    $.ajax({
+        url:"changePassword.ajax",
+        type:"POST",
+        data:{
+            "oldPass":oldPass,
+            "newPass":newPass
+        },
+        beforeSend:function (xhr){
+            xhr.setRequestHeader('lg_token',sessionStorage['lg_token'])
+        },
+        success:function (result){
+            alertConfirmTrans(result)
+        },
+        error:function (result){
+            alertConfirmTrans(result)
+        }
+    })
+}
+
+function eliminateAccount(){
+    let password = $("#password").val();
+    $.ajax({
+        url:"eliminateAccount.ajax",
+        type:"POST",
+        data:{
+            "password":password
+        },
+        beforeSend:function (xhr){
+            xhr.setRequestHeader('lg_token',sessionStorage['lg_token'])
+        },
+        success:function (result){
+            alertConfirmTrans(result)
+            switch (result){
+                case "success":{
+                    sessionStorage.clear();
+                    parent.location.reload();
+                    break;
+                }
+            }
+        },
+        error:function (result){
+            alertConfirmTrans(result)
+        }
+    })
+}
