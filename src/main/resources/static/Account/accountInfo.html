@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+<head>
+    <head>
+        <meta charset="UTF-8">
+        <title>欢迎页面-X-admin2.1</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="../css/font.css">
+        <link rel="stylesheet" href="../css/xadmin.css">
+
+        <script type="text/javascript" src="../lib/layui/layui.js"></script>
+        <!--boostrap-->
+        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </head>
+</head>
+<body>
+    <div class="x-body">
+        <blockquote class="layui-elem-quote" style="font-size: 5px">
+            <span class="x-red">系统采用实名制，第一次登录，请如实填写相关信息！</span><br>
+            <span class="x-red">需要修改只读信息请联系管理员！</span>
+        </blockquote>
+        <fieldset class="layui-elem-field " >
+            <legend>基础信息</legend>
+            <div class="layui-field-box">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item" style="margin: 0 auto">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">性名</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="name" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">性别</label>
+                            <div class="layui-input-inline" lay-verify="required">
+                                <select name="sex">
+                                    <option value="">选择性别</option>
+                                    <option value="0">男</option>
+                                    <option value="1">女</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">学号</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="studentId" class="layui-input" lay-verify="required">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">入学年份</label>
+                            <div class="layui-input-inline">
+                                <select name="startYear">
+                                    <option value="2021">2021年</option>
+                                    <option value="2010">2010年</option>
+                                    <option value="2011">2011年</option>
+                                    <option value="2012">2012年</option>
+                                    <option value="2013">2013年</option>
+                                    <option value="2014">2014年</option>
+                                    <option value="2015">2015年</option>
+                                    <option value="2016">2016年</option>
+                                    <option value="2017">2017年</option>
+                                    <option value="2018">2018年</option>
+                                    <option value="2019">2019年</option>
+                                    <option value="2020">2020年</option>
+                                    <option value="2021">2021年</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">出生日期</label>
+                            <div class="layui-input-block">
+                                <input id="bornYear" type="text" name="bornYear" class="layui-input" placeholder="yyyy-MM-dd" lay-verify="required">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">
+                            <span><i class="layui-icon x-red">*</i>
+                            </span>邮箱</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">
+                            <span><i class="layui-icon x-red">*</i></span>
+                            绑定手机</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">
+                                用户类型</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="userType" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">
+                                受邀码</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="verification" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div style="margin: 0 auto;text-align: center">
+                    <button id="resetBtn" class="layui-btn layui-btn-normal">刷新</button>
+                    <button id="modifyBtn" class="layui-btn layui-btn-normal">修改</button>
+                </div>
+
+            </div>
+
+        </fieldset>
+
+    </div>
+</body>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //日期
+        // laydate.render({
+        //     elem: '#startYear'
+        // });
+        laydate.render({
+            elem: '#bornYear'
+        });
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 5){
+                    return '标题至少得5个字符啊';
+                }
+            }
+            ,pass: [
+                /^[\S]{6,12}$/
+                ,'密码必须6到12位，且不能出现空格'
+            ]
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听指定开关
+        form.on('switch(switchTest)', function(data){
+            layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+        });
+
+        //监听提交
+        form.on('submit(demo1)', function(data){
+            layer.alert(JSON.stringify(data.field), {
+                title: '最终的提交信息'
+            })
+            return false;
+        });
+
+        //表单赋值
+        layui.$('#LAY-component-form-setval').on('click', function(){
+            form.val('example', {
+                "username": "贤心" // "name": "value"
+                ,"password": "123456"
+                ,"interest": 1
+                ,"like[write]": true //复选框选中状态
+                ,"close": true //开关状态
+                ,"sex": "女"
+                ,"desc": "我爱 layui"
+            });
+        });
+
+        //表单取值
+        layui.$('#LAY-component-form-getval').on('click', function(){
+            var data = form.val('example');
+            alert(JSON.stringify(data));
+        });
+
+    });
+</script>
+</html>
