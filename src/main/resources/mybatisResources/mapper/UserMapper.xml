@@ -15,9 +15,6 @@
         <result column="register_time" jdbcType="TIME" property="tegister_time"/>
         <result column="last_login" jdbcType="TIME" property="last_login"/>
     </resultMap>
-    <select id="findAll" resultMap="UserResultMap">
-        selec * from user;
-    </select>
     <select id="findOneByUsername" resultType="com.mp.kfdms.domain.User" parameterType="com.mp.kfdms.domain.User">
         select * from user where username=#{username} limit 1;
     </select>
@@ -53,6 +50,10 @@
     </update>
     <update id="setBaseFolderId" parameterType="com.mp.kfdms.domain.User">
         update user set base_folder_id=#{base_folder_id} where email=#{email};
+    </update>
+    <update id="updateUser" parameterType="com.mp.kfdms.domain.User">
+        update user set telephone=#{telephone},username=#{username},user_type=#{user_type},
+        sex=#{sex},student_id=#{student_id},birthday=#{birthday},start_year=#{start_year} where email=#{email}
     </update>
 
 </mapper>

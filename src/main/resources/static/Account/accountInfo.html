@@ -11,9 +11,11 @@
         <link rel="stylesheet" href="../css/xadmin.css">
 
         <script type="text/javascript" src="../lib/layui/layui.js"></script>
-        <!--boostrap-->
-        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <!--jquery-->
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+        <script type="text/javascript" src="../js/account/account.js"></script>
+        <script type="text/javascript" src="../js/kfdms-notice.js"></script>
     </head>
 </head>
 <body>
@@ -25,18 +27,18 @@
         <fieldset class="layui-elem-field">
             <legend>基础信息</legend>
             <div class="layui-field-box">
-                <form class="layui-form layui-form-pane" action="">
+                <form id="accountInfoForm" class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item" style="margin: 0 auto">
                         <div class="layui-inline">
                             <label class="layui-form-label">性名</label>
                             <div class="layui-input-block">
-                                <input type="text" name="name" class="layui-input">
+                                <input id="userName" type="text" name="name" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label">性别</label>
-                            <div class="layui-input-inline" lay-verify="required">
-                                <select name="sex">
+                            <div class="layui-input-block" lay-verify="required">
+                                <select id="sex" name="sex">
                                     <option value="">选择性别</option>
                                     <option value="0">男</option>
                                     <option value="1">女</option>
@@ -46,16 +48,22 @@
                         <div class="layui-inline">
                             <label class="layui-form-label">学号</label>
                             <div class="layui-input-block">
-                                <input type="text" name="studentId" class="layui-input" lay-verify="required">
+                                <input id="studentId" type="text" name="studentId" class="layui-input" lay-verify="required">
                             </div>
                         </div>
 
                     </div>
                     <div class="layui-form-item">
                         <div class="layui-inline">
+                            <label class="layui-form-label">出生日期</label>
+                            <div class="layui-input-block">
+                                <input id="birthday" type="text" name="bornYear" class="layui-input" placeholder="yyyy-MM-dd" lay-verify="required" onfocus="this.blur()">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
                             <label class="layui-form-label">入学年份</label>
-                            <div class="layui-input-inline">
-                                <select name="startYear">
+                            <div class="layui-input-block">
+                                <select id="startYear" name="startYear">
                                     <option value="2021">2021年</option>
                                     <option value="2010">2010年</option>
                                     <option value="2011">2011年</option>
@@ -72,19 +80,13 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="layui-inline">
-                            <label class="layui-form-label">出生日期</label>
-                            <div class="layui-input-block">
-                                <input id="bornYear" type="text" name="bornYear" class="layui-input" placeholder="yyyy-MM-dd" lay-verify="required">
-                            </div>
-                        </div>
                     </div>
                     <div class="layui-form-item">
                         <label class="layui-form-label">
                             <span><i class="layui-icon x-red">*</i>
                             </span>邮箱</label>
                         <div class="layui-input-block">
-                            <input type="text" name="name" class="layui-input">
+                            <input id="email" type="text" name="email" class="layui-input" disabled="disabled">
                         </div>
                     </div>
                     <div class="layui-form-item">
@@ -92,7 +94,7 @@
                             <span><i class="layui-icon x-red">*</i></span>
                             绑定手机</label>
                         <div class="layui-input-block">
-                            <input type="text" name="name" class="layui-input">
+                            <input id="phoneNumber" type="text" name="phoneNumber" class="layui-input">
                         </div>
                     </div>
                     <div class="layui-form-item">
@@ -100,21 +102,21 @@
                             <label class="layui-form-label">
                                 用户类型</label>
                             <div class="layui-input-block">
-                                <input type="text" name="userType" class="layui-input">
+                                <input id="userType" type="text" name="phoneNumber" class="layui-input" disabled="disabled">
                             </div>
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label">
                                 受邀码</label>
-                            <div class="layui-input-block">
-                                <input type="text" name="verification" class="layui-input">
+                            <div class="layui-input-block" style="width:360px">
+                                <input id="verification" type="text" name="verification" class="layui-input" disabled="disabled">
                             </div>
                         </div>
                     </div>
                 </form>
                 <div style="margin: 0 auto;text-align: center">
-                    <button id="resetBtn" class="layui-btn layui-btn-normal">刷新</button>
-                    <button id="modifyBtn" class="layui-btn layui-btn-normal">修改</button>
+                    <button id="resetBtn" type="button" class="layui-btn layui-btn-normal" onclick="initAccountInfo()">刷新</button>
+                    <button id="modifyBtn" type="button" class="layui-btn layui-btn-normal" onclick="modifyAccountInfo()">修改</button>
                 </div>
 
             </div>
@@ -135,7 +137,7 @@
         //     elem: '#startYear'
         // });
         laydate.render({
-            elem: '#bornYear'
+            elem: '#birthday'
         });
 
         //自定义验证规则
@@ -155,5 +157,6 @@
         });
 
     });
+    initAccountInfo()
 </script>
 </html>

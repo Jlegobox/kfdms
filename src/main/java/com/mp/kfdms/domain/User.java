@@ -14,6 +14,10 @@ public class User {
     public String telephone;
     public String username;
     public String password;
+    public int sex;
+    public String student_id;
+    public Date birthday;
+    public int start_year;
     public int user_type;
     public String verification;
     public int active_status;
@@ -60,6 +64,38 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getSex() {
+        return sex;
+    }
+
+    public void setSex(int sex) {
+        this.sex = sex;
+    }
+
+    public String getStudent_id() {
+        return student_id;
+    }
+
+    public void setStudent_id(String student_id) {
+        this.student_id = student_id;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public int getStart_year() {
+        return start_year;
+    }
+
+    public void setStart_year(int start_year) {
+        this.start_year = start_year;
     }
 
     public int getUser_type() {
@@ -116,5 +152,27 @@ public class User {
 
     public void setLast_login(Date last_login) {
         this.last_login = last_login;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", telephone='" + telephone + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", sex='" + sex + '\'' +
+                ", student_id='" + student_id + '\'' +
+                ", birthday=" + birthday +
+                ", start_year=" + start_year +
+                ", user_type=" + user_type +
+                ", verification='" + verification + '\'' +
+                ", active_status=" + active_status +
+                ", base_folder_id=" + base_folder_id +
+                ", image_path='" + image_path + '\'' +
+                ", register_time=" + register_time +
+                ", last_login=" + last_login +
+                '}';
     }
 }

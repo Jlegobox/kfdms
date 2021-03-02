@@ -26,4 +26,6 @@ public interface UserMapper {
     public int changeImagePath(User user);
     public int changeUserName(User user);
     public int setBaseFolderId(User user);
+
+    public int updateUser(User currentUser);
 }
