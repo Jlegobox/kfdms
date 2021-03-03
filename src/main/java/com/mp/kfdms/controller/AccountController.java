@@ -2,6 +2,7 @@ package com.mp.kfdms.controller;
 
 import com.mp.kfdms.annotation.CurrentUser;
 import com.mp.kfdms.domain.User;
+import com.mp.kfdms.domain.VerificationLog;
 import com.mp.kfdms.pojo.JsonModel;
 import com.mp.kfdms.service.UserService;
 import com.mp.kfdms.util.GsonUtil;
@@ -12,6 +13,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @Author J
@@ -49,5 +51,16 @@ public class AccountController {
     @RequestMapping("/eliminateAccount.ajax")
     public String eliminateAccount(@CurrentUser User currentUser,String password){
         return userService.eliminateAccount(currentUser,password);
+    }
+
+    @RequestMapping("/createInviteCode.ajax")
+    public String createInviteCode(@CurrentUser User currentUser){
+        return userService.createInviteCode(currentUser);
+    }
+
+    @RequestMapping("/getAllInviteCode.ajax")
+    public String getAllInviteCode(@CurrentUser User currentUser){
+        List<VerificationLog> verificationLogs = userService.showVerificationLog(currentUser);
+        return GsonUtil.instance().toJson(verificationLogs);
     }
 }

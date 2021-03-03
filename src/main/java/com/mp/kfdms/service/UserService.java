@@ -1,8 +1,10 @@
 package com.mp.kfdms.service;
 
+import com.mp.kfdms.domain.VerificationLog;
 import com.mp.kfdms.mapper.FolderMapper;
 import com.mp.kfdms.mapper.UserMapper;
 import com.mp.kfdms.domain.User;
+import com.mp.kfdms.mapper.VerificationLogMapper;
 import com.mp.kfdms.pojo.JsonModel;
 import com.mp.kfdms.pojo.LoginInfo;
 import com.mp.kfdms.pojo.PublicKeyInfo;
@@ -21,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -39,6 +42,9 @@ public class UserService {
 
     @Resource
     private FolderService folderService;
+
+    @Resource
+    private VerificationLogMapper verificationLogMapper;
 
     @Resource
     private RSAKeyUtil rsaKeyUtil;
@@ -234,5 +240,20 @@ public class UserService {
     public String clearUser() {
         // TODO: 2021/3/2 用户表设置用户删除后，根据用户id，删除上传记录，文件分享记录等 考虑异步方式进行
         return null;
+    }
+
+    public String createInviteCode(User currentUser) {
+        VerificationLog verificationLog = new VerificationLog();
+        String uuid = UUID.randomUUID().toString();
+        verificationLog.setVerificationCode(uuid);
+        verificationLog.setVerificationOwner(currentUser.getId());
+        verificationLog.setUsedUserEmail("");
+        verificationLogMapper.addLog(verificationLog);
+        return verificationLog.getVerificationCode();
+    }
+
+    public List<VerificationLog> showVerificationLog(User currentUser){
+        List<VerificationLog> all = verificationLogMapper.findAll(currentUser.getId());
+        return all;
     }
 }

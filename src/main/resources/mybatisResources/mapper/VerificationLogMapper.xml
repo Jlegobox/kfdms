@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mp.kfdms.mapper.VerificationLogMapper">
+    <resultMap id="baseResultMap" type="com.mp.kfdms.domain.VerificationLog">
+        <result column="verification_id" property="verificationId"/>
+        <result column="verification_owner" property="verificationOwner"/>
+        <result column="verification_code" property="verificationCode"/>
+        <result column="create_time" property="createTime"/>
+        <result column="is_used" property="isUsed"/>
+        <result column="used_time" property="usedTime"/>
+        <result column="used_user_email" property="usedUserEmail"/>
+    </resultMap>
+    <insert id="addLog" parameterType="com.mp.kfdms.domain.VerificationLog">
+        insert into verification_log(verification_owner,verification_code,used_user_email)values (
+        #{verificationOwner},#{verificationCode},#{usedUserEmail}
+        )
+    </insert>
+    <update id="updateLog" parameterType="com.mp.kfdms.domain.VerificationLog">
+        update verification_log set is_used=#{isUsed},used_time=now(),used_user_email=#{usedUserEmail}
+        where verification_code = #{verificationCode}
+    </update>
+    <select id="findOne" parameterType="java.lang.String">
+        select * from verification_log where verification_code = #{code}
+    </select>
+    <select id="findAll" parameterType="java.lang.Integer">
+        select * from verification_log where verification_owner = #{verificationOwner}
+    </select>
+</mapper>

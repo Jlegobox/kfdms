@@ -18,7 +18,6 @@
         <result column="delete_time" property="deleteTime"/>
         <result column="status" property="status"/>
         <result column="version" property="version"/>
-
     </resultMap>
     <insert id="addShareLog" parameterType="com.mp.kfdms.domain.FileShareShareLog" useGeneratedKeys="true" keyProperty="shareLogId" keyColumn="sharelog_id">
         insert into fileshare_sharelog(user_id, file_id, folder_id,file_name, access_code,share_link, visit_num, visit_limit,
