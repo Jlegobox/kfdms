@@ -7,22 +7,22 @@
         <result column="verification_code" property="verificationCode"/>
         <result column="create_time" property="createTime"/>
         <result column="is_used" property="isUsed"/>
-        <result column="used_time" property="usedTime"/>
+        <result column="drop_time" property="DropTime"/>
         <result column="used_user_email" property="usedUserEmail"/>
     </resultMap>
     <insert id="addLog" parameterType="com.mp.kfdms.domain.VerificationLog">
-        insert into verification_log(verification_owner,verification_code,used_user_email)values (
-        #{verificationOwner},#{verificationCode},#{usedUserEmail}
+        insert into verification_log(verification_owner,verification_code,used_user_email,is_used)values (
+        #{verificationOwner},#{verificationCode},#{usedUserEmail},#{isUsed}
         )
     </insert>
     <update id="updateLog" parameterType="com.mp.kfdms.domain.VerificationLog">
-        update verification_log set is_used=#{isUsed},used_time=now(),used_user_email=#{usedUserEmail}
-        where verification_code = #{verificationCode}
+        update verification_log set is_used=#{isUsed},drop_time=#{dropTime}
+        where verification_id = #{verificationId}
     </update>
-    <select id="findOne" parameterType="java.lang.String">
-        select * from verification_log where verification_code = #{code}
+    <select id="findOne" parameterType="java.lang.Integer" resultMap="baseResultMap">
+        select * from verification_log where verification_owner = #{verificationOwner} and is_used=1
     </select>
-    <select id="findAll" parameterType="java.lang.Integer">
+    <select id="findAll" parameterType="java.lang.Integer" resultMap="baseResultMap">
         select * from verification_log where verification_owner = #{verificationOwner}
     </select>
 </mapper>

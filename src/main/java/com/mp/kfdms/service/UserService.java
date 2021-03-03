@@ -243,17 +243,37 @@ public class UserService {
     }
 
     public String createInviteCode(User currentUser) {
+        try{
+            VerificationLog one = verificationLogMapper.findOne(currentUser.getId());
+            one.setIsUsed(0); // 废弃
+            one.setDropTime(new Date());
+            verificationLogMapper.updateLog(one);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         VerificationLog verificationLog = new VerificationLog();
         String uuid = UUID.randomUUID().toString();
         verificationLog.setVerificationCode(uuid);
         verificationLog.setVerificationOwner(currentUser.getId());
+        verificationLog.setIsUsed(1); // 正在使用
         verificationLog.setUsedUserEmail("");
         verificationLogMapper.addLog(verificationLog);
         return verificationLog.getVerificationCode();
     }
 
-    public List<VerificationLog> showVerificationLog(User currentUser){
-        List<VerificationLog> all = verificationLogMapper.findAll(currentUser.getId());
-        return all;
+    public VerificationLog showVerificationLog(User currentUser){
+        if(currentUser!=null){
+            VerificationLog one = verificationLogMapper.findOne(currentUser.getId());
+            System.out.println("OK");
+            return one;
+        }else {
+            return null;
+        }
+    }
+
+    public String refreshInviteCode(User currentUser) {
+        String inviteCode = createInviteCode(currentUser);
+        return inviteCode;
     }
 }

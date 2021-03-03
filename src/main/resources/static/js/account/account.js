@@ -15,8 +15,8 @@ function initAccountInfo() {
                 document.getElementById("studentId").setAttribute("value", data["student_id"]);
                 $('#startYear').val(data["start_year"]);
                 let birthday = new Date(data["birthday"]);
-                let num = ["01","02","03","04","05","06","07","08","09","10","11","12"]
-                let day = birthday.getDay()>10?birthday.getDay():num[birthday.getDay()-1]
+                let num = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+                let day = birthday.getDay() > 10 ? birthday.getDay() : num[birthday.getDay() - 1]
                 let birthdayStr = birthday.getFullYear() + "-" + num[birthday.getMonth()] + "-" + day;
                 document.getElementById("birthday").setAttribute("value", birthdayStr);
                 document.getElementById("email").setAttribute("value", data["email"]);
@@ -26,6 +26,21 @@ function initAccountInfo() {
             }
         }
     })
+
+    $.ajax({
+        url: "getInviteCode.ajax",
+        type: "POST",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
+        },
+        success: function (result) {
+            document.getElementById("inviteCode").setAttribute("value", result);
+        },
+        error: function (result) {
+            alert("error")
+        }
+    })
+
 }
 
 function modifyAccountInfo() {
@@ -62,56 +77,72 @@ function modifyAccountInfo() {
     })
 }
 
-function changePassword(){
+function changePassword() {
     let oldPass = $("#oldPasswordStr").val();
     let newPass = $("#newPasswordStr").val();
     let newPass2 = $("#newPasswordStr2").val();
-    if(newPass !== newPass2){
+    if (newPass !== newPass2) {
         alertConfirmTrans("两次密码不相同！")
-        return ;
+        return;
     }
     $.ajax({
-        url:"changePassword.ajax",
-        type:"POST",
-        data:{
-            "oldPass":oldPass,
-            "newPass":newPass
+        url: "changePassword.ajax",
+        type: "POST",
+        data: {
+            "oldPass": oldPass,
+            "newPass": newPass
         },
-        beforeSend:function (xhr){
-            xhr.setRequestHeader('lg_token',sessionStorage['lg_token'])
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
         },
-        success:function (result){
+        success: function (result) {
             alertConfirmTrans(result)
         },
-        error:function (result){
+        error: function (result) {
             alertConfirmTrans(result)
         }
     })
 }
 
-function eliminateAccount(){
+function eliminateAccount() {
     let password = $("#password").val();
     $.ajax({
-        url:"eliminateAccount.ajax",
-        type:"POST",
-        data:{
-            "password":password
+        url: "eliminateAccount.ajax",
+        type: "POST",
+        data: {
+            "password": password
         },
-        beforeSend:function (xhr){
-            xhr.setRequestHeader('lg_token',sessionStorage['lg_token'])
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
         },
-        success:function (result){
+        success: function (result) {
             alertConfirmTrans(result)
-            switch (result){
-                case "success":{
+            switch (result) {
+                case "success": {
                     sessionStorage.clear();
                     parent.location.reload();
                     break;
                 }
             }
         },
-        error:function (result){
+        error: function (result) {
             alertConfirmTrans(result)
+        }
+    })
+}
+
+function refreshCode(){
+    $.ajax({
+        url: "refreshInviteCode.ajax",
+        type: "POST",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
+        },
+        success:function (result){
+            document.getElementById("inviteCode").setAttribute("value", result);
+        },
+        error:function (result){
+            alertConfirmTrans("error");
         }
     })
 }

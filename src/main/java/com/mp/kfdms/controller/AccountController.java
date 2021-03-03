@@ -58,9 +58,14 @@ public class AccountController {
         return userService.createInviteCode(currentUser);
     }
 
-    @RequestMapping("/getAllInviteCode.ajax")
-    public String getAllInviteCode(@CurrentUser User currentUser){
-        List<VerificationLog> verificationLogs = userService.showVerificationLog(currentUser);
-        return GsonUtil.instance().toJson(verificationLogs);
+    @RequestMapping("/getInviteCode.ajax")
+    public String getInviteCode(@CurrentUser User currentUser){
+        VerificationLog verificationLog = userService.showVerificationLog(currentUser);
+        return verificationLog.getVerificationCode();
+    }
+
+    @RequestMapping("/refreshInviteCode.ajax")
+    public String refreshInviteCode(@CurrentUser User currentUser){
+        return userService.refreshInviteCode(currentUser);
     }
 }

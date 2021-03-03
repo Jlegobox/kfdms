@@ -15,7 +15,7 @@ public class VerificationLog {
     private String verificationCode;
     private Date createTime;
     private int isUsed;
-    private Date usedTime;
+    private Date dropTime;
     private String usedUserEmail;
 
     public int getVerificationId() {
@@ -58,12 +58,12 @@ public class VerificationLog {
         this.isUsed = isUsed;
     }
 
-    public Date getUsedTime() {
-        return usedTime;
+    public Date getDropTime() {
+        return dropTime;
     }
 
-    public void setUsedTime(Date usedTime) {
-        this.usedTime = usedTime;
+    public void setDropTime(Date dropTime) {
+        this.dropTime = dropTime;
     }
 
     public String getUsedUserEmail() {

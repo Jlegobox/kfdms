@@ -15,6 +15,6 @@ import java.util.List;
 public interface VerificationLogMapper {
     public int addLog(VerificationLog verificationLog);
     public int updateLog(VerificationLog verificationLog);
-    public VerificationLog findOne(String code);
+    public VerificationLog findOne(int ownerId);
     public List<VerificationLog> findAll(int ownerId);
 }

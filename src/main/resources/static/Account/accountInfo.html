@@ -3,7 +3,7 @@
 <head>
     <head>
         <meta charset="UTF-8">
-        <title>欢迎页面-X-admin2.1</title>
+        <title>用户信息</title>
         <meta name="renderer" content="webkit">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
@@ -123,6 +123,23 @@
 
         </fieldset>
 
+        <fieldset class="layui-elem-field">
+            <legend>邀请码</legend>
+            <div class="layui-field-box">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">
+                            </span>邀请码</label>
+                        <div class="layui-input-block">
+                            <input id="inviteCode" type="text" name="inviteCode" class="layui-input" disabled="disabled">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <button id="refreshInviteCodeBtn" type="button" class="layui-btn layui-btn-normal" onclick="refreshCode()">刷新邀请码</button>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
     </div>
 </body>
 <script>
