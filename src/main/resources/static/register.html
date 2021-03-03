@@ -23,20 +23,20 @@
     <div class="login layui-anim layui-anim-up">
         <div class="message">新用户注册</div>
         <div id="darkbannerwrap"></div>
-        
         <form method="post" class="layui-form" >
-            <input id="email" name="email" placeholder="请输入邮箱"  type="text" lay-verify="required" class="layui-input" >
+            <input id="email" name="email" placeholder="请输入邮箱"  type="text" lass="layui-input" >
             <hr class="hr15">
-            <input id="password1" name="password1" lay-verify="required" placeholder="请输入密码"  type="password" class="layui-input">
+            <input id="password1" name="password1" placeholder="请输入密码"  type="password" class="layui-input">
             <hr class="hr15">
-            <input id="passowrd2" name="passowrd2" lay-verify="required" placeholder="请再次输入密码" type="password" class="layui-input" >
+            <input id="passowrd2" name="passowrd2" placeholder="请再次输入密码" type="password" class="layui-input" >
             <hr class="hr15">
-            <input id="verification_code" name="verification_code" placeholder="输入邀请码（非必须）" type="text" class="layui-input">
+            <input id="verification_code" name="verification_code" placeholder="输入邀请码" type="text" class="layui-input">
             <hr class="hr15">
             <input value="注册" style="width:100%;" type="button" onclick="doRegister()">
             <hr class="hr20">
+            <input value="返回" style="width:100%;" type="button" onclick="location.href='/login.html'">
+            <hr class="hr20">
         </form>
-<!--        <input class="layui-btn" style="width:100%;">注册</input>-->
     </div>
 
     <script>
