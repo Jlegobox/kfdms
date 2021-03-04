@@ -92,6 +92,7 @@ public class AccountController {
         if(currentUser.getUser_type() != 0){
             return "authError";
         }
+
         String inviteMode = ConfigurationReader.instance().getConf("sys.login.inviteMode");
         if(inviteMode!=null){
             int i = Integer.parseInt(inviteMode);
