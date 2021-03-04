@@ -1,4 +1,4 @@
-var deskFolderId = 0
+var squareFolderId = 0
 // 分页参数
 var pageParam = {
     currentPage: 1,//当前页数
@@ -8,57 +8,16 @@ var pageParam = {
 }
 
 // 加载页面时操作
-function initFileDesk() {
-    getBaseFolderId()
-    refreshFileDesk(deskFolderId)
-}
-
-function getBaseFolderId() {
-    if (deskFolderId !== 0) {
-        return;
-    }
-    if (typeof (sessionStorage["deskFolderId"]) !== "undefined" && sessionStorage["deskFolderId"] !== "") {
-        deskFolderId = sessionStorage["deskFolderId"]
-        return;
-    }
-    $.ajax({
-        url: "DataCloud/getDeskFolderId.ajax",
-        async: false, // 发送同步请求，保证deskFolder的有效性
-        type: "POST",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('lg_token', sessionStorage["lg_token"])
-        },
-        success: function (result) {
-            switch (result) {
-                case "error": {
-                    alert("Access Forbidden!");
-                    sessionStorage["lg_token"] = "";
-                    top.location = "login.html"
-                    // window.navigator("login.html") // 不合适
-                    break;
-                }
-                default: {
-                    deskFolderId = JSON.parse(result);
-                    sessionStorage["deskFolderId"] = deskFolderId;
-                    break;
-                }
-            }
-
-        },
-        error: function (result) {
-            alert("Access Forbidden!");
-            sessionStorage["lg_token"] = "";
-            top.location = "login.html"
-            // window.navigator("login.html") // 不合适
-        }
-    })
+function initFileSquare() {
+    squareFolderId = 0; // 文件根目录
+    refreshFileSquare(squareFolderId)
 }
 
 // 刷新整个DataCloud 包括导航栏等
-function refreshFileDesk(folderId) {
-    deskFolderId = folderId
-    refreshNavigation(folderId)
-    refreshFolder(folderId, pageParam)
+function refreshFileSquare(folderId) {
+    squareFolderId = folderId
+    refreshSquareNavigation(folderId)
+    refreshFolderPublic(folderId, pageParam)
 }
 
 // 设置同步时间
@@ -80,9 +39,9 @@ function refreshTime() {
 }
 
 // 请求导航栏数据
-function refreshNavigation(deskFolderId) {
+function refreshSquareNavigation(deskFolderId) {
     $.ajax({
-        url: "DataCloud/getNavigation.ajax",
+        url: "/DataCloud/getNavigation.ajax",
         type: "POST",
         data: {
             folderId: deskFolderId
@@ -91,7 +50,7 @@ function refreshNavigation(deskFolderId) {
             xhr.setRequestHeader("lg_token", sessionStorage["lg_token"])
         },
         success: function (result) {
-            loadNavigation(result);
+            loadSquareNavigation(result);
         },
         error: function (result) {
             alert("error");
@@ -100,17 +59,7 @@ function refreshNavigation(deskFolderId) {
 }
 
 //加载导航栏
-function loadNavigation(data) {
-    // 保证导航的面包屑class起作用，不然默认隐藏
-    layui.use('element', function(){
-        var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
-
-        //监听导航点击
-        element.on('nav(demo)', function(elem){
-            //console.log(elem)
-            layer.msg(elem.text());
-        });
-    });
+function loadSquareNavigation(data) {
 
     data = JSON.parse(data)
     var navigation = document.getElementById("fileDeskNavigation");
@@ -118,16 +67,13 @@ function loadNavigation(data) {
     // navigation.innerHTML="";
     // // root标签
     // var elem = document.createElement("a");
-    if (data == null || data.length === 0) {
-        initFileDesk();
-    }
-
+    var root_id = data[data.length - 1].folder_id;
     if (data.length > 1) {
-        navigation.innerHTML = "<a href='javascript:refreshFileDesk(" + data[data.length - 2].folder_id + ")'> root</a>";
+        navigation.innerHTML = "<a href='javascript:refreshFileSquare(" + 0 + ")'> root</a>";
     } else {
         // 当前为root文件夹
-        navigation.innerHTML = "<a href='javascript:refreshFileDesk(" + data[data.length - 1].folder_id + ")'> root</a>";
-        upperlayerBtn.setAttribute("onclick", "javascript:refreshFileDesk(" + data[data.length - 1].folder_id + ")")
+        navigation.innerHTML = "<a href='javascript:refreshFileSquare(" + 0 + ")'> root</a>";
+        upperlayerBtn.setAttribute("onclick", "javascript:refreshFileSquare(" + root_id + ")")
         return;
     }
 
@@ -136,8 +82,8 @@ function loadNavigation(data) {
     // seperateElem.innerHTML="/";
     // seperateElem.setAttribute("lay-separator","");
 
-    if (data.length > 2) {
-        for (var i = data.length - 3; i >= 1; i--) {
+    if (data.length >= 2) {
+        for (var i = data.length - 2; i > 0; i--) {
             var seperateElem = document.createElement('span');
             seperateElem.innerHTML = "/";
             seperateElem.setAttribute("lay-separator", "");
@@ -145,10 +91,10 @@ function loadNavigation(data) {
 
             var elem = document.createElement("a");
             elem.innerHTML = data[i].folder_name;
-            elem.setAttribute("href", "javascript:refreshFileDesk(" + data[i].folder_id + ")")
+            elem.setAttribute("href", "javascript:refreshFileSquare(" + data[i].folder_id + ")")
             navigation.appendChild(elem);
         }
-        upperlayerBtn.setAttribute("onclick", "javascript:refreshFileDesk(" + data[1].folder_id + ")")
+        upperlayerBtn.setAttribute("onclick", "javascript:refreshFileSquare(" + data[1].folder_id + ")")
         // 最后一个文件夹,加粗处理
         var seperateElem = document.createElement('span');
         seperateElem.innerHTML = "/";
@@ -156,7 +102,7 @@ function loadNavigation(data) {
         navigation.appendChild(seperateElem);
 
         elem = document.createElement("a");
-        elem.innerHTML = "<a href='javascript:refreshFileDesk(" + deskFolderId + ")'><cite>" + data[0].folder_name + "</cite></a>";
+        elem.innerHTML = "<a href='javascript:refreshFileSquare(" + squareFolderId + ")'><cite>" + data[0].folder_name + "</cite></a>";
         navigation.appendChild(elem);
     }
 }
@@ -187,24 +133,24 @@ function changePageParam() {
     // 后面直接从后台得到，再refreshFolder中设置
     // pageParam.totalCount = getTotalCount(deskFolderId);
     // pageParam.totalPage = Math.ceil(pageParam.totalCount / pageParam.PageSize);
-    refreshFolder(deskFolderId, pageParam);
+    refreshFolder(squareFolderId, pageParam);
 }
 
 function prePage() {
     // 后台数据可能变化，因此直接减一，其他交给后端去做
     pageParam.currentPage = pageParam.currentPage - 1;
-    refreshFolder(deskFolderId, pageParam)
+    refreshFolder(squareFolderId, pageParam)
 }
 
 function nextPage() {
     pageParam.currentPage = pageParam.currentPage + 1;
-    refreshFolder(deskFolderId, pageParam)
+    refreshFolder(squareFolderId, pageParam)
 }
 
-function refreshFolder(folderId, pageParam) {
+function refreshFolderPublic(folderId, pageParam) {
     // todo 权限验证
     $.ajax({
-        url: "DataCloud/loadFolder.ajax",
+        url: "/DataCloud/loadFolderPublic.ajax",
         type: "POST",
         data: {
             folderId: folderId,
@@ -220,18 +166,18 @@ function refreshFolder(folderId, pageParam) {
         success: function (result) {
             switch (result) {
                 case "error":
-                    alert("error");
+                    alert("loadFolder error");
                     break;
                 default: {
                     // 记住页面
-                    deskFolderId = folderId;
-                    sessionStorage["deskFolderId"] = deskFolderId;
+                    squareFolderId = folderId;
+                    sessionStorage["squareFolderId"] = squareFolderId;
                     result = JSON.parse(result);
                     // 清空
                     $("#file_desk_tbody").html("");
                     loadFolderData(result);
                     loadTotalCount(result.pageParam);
-                    deskFolderId = folderId;
+                    squareFolderId = folderId;
                     refreshTime();
                 }
             }
@@ -327,7 +273,7 @@ function getElemRow(elemParam) {
     fileNameLink.innerText = elemParam.fileName;
     if (elemParam.isFolder) {
         fileNameLink.innerHTML = "<b>" + elemParam.fileName + "</b>";
-        fileNameLink.setAttribute("href", "javascript:refreshFileDesk(\"" + elemParam.fileId + "\");")
+        fileNameLink.setAttribute("href", "javascript:refreshFileSquare(\"" + elemParam.fileId + "\");")
     } else {
         fileNameLink.setAttribute("style", "color:black")
     }
@@ -391,236 +337,37 @@ function createOperationBtn(fileOperation, elemParam) {
     downloadBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
     downloadBtn.setAttribute("onclick", "downloadFile(" + elemParam.fileId + ")")
     // 分享按钮
-    let shareBtn = document.createElement('button');
-    shareBtn.innerText = "分享"
-    shareBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
-    shareBtn.setAttribute("onclick", "shareFile(" + elemParam.fileId + ",\"" + elemParam.fileName + "\"," + elemParam.isFolder + ")")
+    let previewBtn = document.createElement('button');
+    previewBtn.innerText = "预览"
+    previewBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
+    previewBtn.setAttribute("onclick", "alertConfirmTrans(\"不支持预览\")")
 
-    // 更多操作按钮
-    let moreBtnGroup = document.createElement("div")
-    moreBtnGroup.setAttribute("class", "btn-group")
-    moreBtnGroup.innerHTML = '<button type="button" class="layui-btn layui-btn-normal" data-toggle="dropdown">更多</button>'
-
-    let moreBtnMenu = document.createElement('ul');
-    moreBtnMenu.setAttribute("class", "dropdown-menu");
-    moreBtnMenu.setAttribute("role", "menu");
-
-    let editBtn = document.createElement("li")
-    editBtn.innerHTML = '<a href="javascript:openFileEditPage(' + elemParam.fileId + ')" onclick="">编辑</a>'
-
-    let previewBtn = document.createElement("li")
-    previewBtn.innerHTML = '<a href="javascript:alert(' + "\'敬请期待\'" + ')">预览</a>'
-
-    let deleteBtn = document.createElement("li")
-    deleteBtn.innerHTML = '<a href="javascript:delFile(' + elemParam.fileId + "," + elemParam.isFolder + ')">删除</a>'
+    let saveBtn = document.createElement('button');
+    saveBtn.innerText = "保存"
+    saveBtn.setAttribute("class", "layui-btn layui-btn-sm layui-btn-radius layui-btn-normal")
+    saveBtn.setAttribute("onclick", "alertConfirmTrans(\"不支持保存\")")
 
     // 权限校验
     if (elemParam.isFolder) {
         downloadBtn.setAttribute("class", disable);
-        editBtn.innerHTML = '<a href="javascript:openFolderEditPage(' + elemParam.fileId + ')" onclick="">编辑</a>'
-        previewBtn.setAttribute("class", "disabled");
+        downloadBtn.setAttribute("disabled","disabled")
+        previewBtn.setAttribute("class", disable);
+        previewBtn.setAttribute("disabled","disabled")
     }
-
-    // 下拉按钮组装
-    moreBtnGroup.appendChild(moreBtnMenu);
-    moreBtnMenu.appendChild(editBtn);
-    moreBtnMenu.appendChild(previewBtn)
-    moreBtnMenu.appendChild(deleteBtn)
 
     // 按钮组组装
     btnGroup.appendChild(downloadBtn)
-    btnGroup.appendChild(shareBtn)
-    btnGroup.appendChild(moreBtnGroup)
+    btnGroup.appendChild(previewBtn)
+    btnGroup.appendChild(saveBtn)
 
     fileOperation.appendChild(btnGroup)
-
-
-    // 添加按钮
-    // fileOperation.appendChild(downloadBtn)
-    // fileOperation.appendChild(editBtn)
-    // fileOperation.appendChild(previewBtn)
-    // fileOperation.appendChild(deleteBtn)
 }
 
-/**
- *删除文件（根据fileType判断是文件or文件夹）
- */
-function delFile(fileId, isFolder) {
-
-    $.ajax({
-        url: "DataCloud/deleteFile.ajax",
-        type: "POST",
-        data: {
-            fileId: fileId,
-            fileType: isFolder
-        },
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("lg_token", sessionStorage["lg_token"])
-        },
-        success: function (result) {
-            switch (result) {
-                case "not empty": {
-                    alert("文件夹不为空");
-                    break;
-                }
-                case "sucess": {
-                    if (isFolder)
-                        alert("文件夹已删除");
-                    else
-                        alert("文件已被删除");
-                    break;
-                }
-                case "error": {
-                    alert("删除失败");
-                }
-            }
-
-        },
-        error: function (result) {
-            alert("sever error!");
-            sessionStorage.clear();
-            top.location = "login.html";
-        },
-        complete: function (xhr, data) {
-            refreshFileDesk(deskFolderId);
-        }
-    })
-
-}
 
 function downloadFile(fileId) {
-    window.open("DataCloud/downloadFile.do?fileId=" + fileId)
+    window.open("/DataCloud/downloadFile.do?fileId=" + fileId)
 }
 
-function createFolder() {
-    var data = $('#newFolderInfo').serialize() + '&folderDescription=' + $('#folderDescription').val()
-        + '&parentFolderId=' + sessionStorage["deskFolderId"];
-    $.ajax({
-        url: "DataCloud/createFolder.ajax",
-        type: 'POST',
-        data: data,
-        async: false,
-        dataType: 'text',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
-        },
-        success: function (result) {
-            alert(result)
-        },
-        error: function (result) {
-            alert("error")
-        },
-        complete: function (xhr, data) {
-            x_admin_close();
-            // 调用refreshFileDesk()会显式不成功，可能是因为还在子窗口，因此直接使用刷新父窗口
-            x_admin_father_reload();
-
-        }
-
-    })
-}
-
-function modifyFolder(folderId) {
-    var data = $('#folderInfo').serialize() + '&folderDescription=' + $('#folderDescription').val()
-        + '&folderId=' + folderId;
-    $.ajax({
-        url: "DataCloud/modifyFolder.ajax",
-        type: 'POST',
-        data: data,
-        async: false,
-        dataType: 'text',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
-        },
-        success: function (result) {
-        },
-        error: function (result) {
-        },
-        complete: function (xhr, data) {
-            datacloud_close_refresh()
-        }
-
-    })
-}
-
-function modifyFile(fileId) {
-    var data = $('#fileInfo').serialize() + '&fileDescription=' + $('#fileDescription').val()
-        + '&fileId=' + fileId;
-    $.ajax({
-        url: "DataCloud/modifyFile.ajax",
-        type: 'POST',
-        data: data,
-        async: false,
-        dataType: 'text',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
-        },
-        success: function (result) {
-        },
-        error: function (result) {
-        },
-        complete: function (xhr, data) {
-            datacloud_close_refresh()
-        }
-
-    })
-}
-
-function openFolderEditPage(folderId) {
-    $.ajax({
-        url: "DataCloud/getFolderInfo.ajax",
-        type: 'POST',
-        data: {
-            "folderId": folderId
-        },
-        async: false,
-        dataType: 'text',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
-        },
-        success: function (result) {
-            sessionStorage["folderInfo"] = result
-            x_admin_show('编辑文件夹属性', './folderInfo.html', 600, 400)
-        },
-        error: function (result) {
-            alert("error")
-        },
-        complete: function (xhr, data) {
-            datacloud_close_refresh()
-        }
-    })
-}
-
-function openFileEditPage(fileId) {
-    $.ajax({
-        url: "DataCloud/getFileInfo.ajax",
-        type: 'POST',
-        data: {
-            "fileId": fileId
-        },
-        async: false,
-        dataType: 'text',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
-        },
-        success: function (result) {
-            sessionStorage["fileInfo"] = result
-            x_admin_show('编辑文件属性', './fileInfo.html', 600, 400)
-        },
-        error: function (result) {
-            alert("error")
-        },
-        complete: function (xhr, data) {
-            datacloud_close_refresh()
-        }
-    })
-}
-
-function shareFile(fileId, fileName, isFolder) {
-    sessionStorage["shareFileId"] = fileId;
-    sessionStorage["shareFileType"] = isFolder;
-    let index = x_admin_show('创建分享链接：' + fileName, 'DataCloud/Share/FileShareCreate.html', 600, 400)
-}
 
 function datacloud_close_refresh() {
     x_admin_close();

@@ -121,20 +121,26 @@ public class FolderService {
         return "success";
     }
 
+    // 返回父文件夹组（包括自己）
     public List<Folder> getParentFolder(int folderId) {
+        ArrayList<Folder> folders = new ArrayList<Folder>();
         Folder currentFolder = new Folder();
         currentFolder.setFolder_id(folderId);
-        currentFolder = folderMapper.getFolderById(currentFolder.getFolder_id());
-        if(currentFolder == null)
-            return null;
-        ArrayList<Folder> folders = new ArrayList<Folder>();
-        folders.add(currentFolder);
+        if(folderId!=0){
+            currentFolder = folderMapper.getFolderById(currentFolder.getFolder_id());
+            if(currentFolder == null)
+                return null;
+            folders.add(currentFolder);
+        }
         while(currentFolder.getFolder_parent_id() != 0){
             currentFolder = folderMapper.getParentFolderByFolderParentId(currentFolder.getFolder_parent_id());
             if(currentFolder == null)
                 break;
             folders.add(currentFolder);
         }
+        Folder rootFolder = new Folder();
+        rootFolder.setFolder_id(0);
+        folders.add(rootFolder);
         return folders;
     }
 

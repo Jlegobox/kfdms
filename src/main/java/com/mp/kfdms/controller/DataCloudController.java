@@ -125,13 +125,21 @@ public class DataCloudController {
         String returnMsg="error";
         // 文件夹权限判断
         User currentUser = UserUtil.getUserFromToken(request.getHeader("lg_token"));
-        Folder currentFolder = folderService.getCurrentFolder(currentUser, folderId);
-        if(currentFolder == null){
-            return returnMsg;
+        Folder currentFolder = null;
+        if(folderId!=0){
+            currentFolder = folderService.getCurrentFolder(currentUser, folderId);
+            if(currentFolder == null){
+                return returnMsg;
+            }else {
+                //权限校验
+                String permission = folderService.checkFolderPermission(currentUser, currentFolder);
+            }
         }else {
-            //权限校验
-            String permission = folderService.checkFolderPermission(currentUser, currentFolder);
+            currentFolder = new Folder();
+            currentFolder.setFolder_id(0);
+            String permission = "success";
         }
+
         // 新建文件夹视图
         FolderView folderView = new FolderView();
         // 找到文件夹内所有数据的数量
@@ -167,6 +175,66 @@ public class DataCloudController {
         return GsonUtil.instance().toJson(folderView);
     }
 
+    // 加载文件夹公开内容用于FileSquare
+    @RequestMapping("/loadFolderPublic.ajax")
+    public String loadFolderPublic(final HttpServletRequest request, @RequestParam("folderId") int folderId, PageParam pageParam){
+        String returnMsg="error";
+        // 文件夹权限判断
+        User currentUser = UserUtil.getUserFromToken(request.getHeader("lg_token"));
+        Folder currentFolder = null;
+        if(folderId!=0){
+            currentFolder = folderService.getCurrentFolder(currentUser, folderId);
+            if(currentFolder == null){
+                return returnMsg;
+            }else {
+                //权限校验
+                String permission = folderService.checkFolderPermission(currentUser, currentFolder);
+            }
+        }else {
+            currentFolder = new Folder();
+            currentFolder.setFolder_id(0);
+            String permission = "success";
+        }
+
+        // 新建文件夹视图
+        FolderView folderView = new FolderView();
+        // 找到文件夹内所有数据的数量
+        int totalCount = folderService.getTotalCount(currentFolder);
+        pageParam.setTotalCount(totalCount);
+        pageParam.setTotalPage((int) Math.ceil(totalCount/pageParam.getPageSize()));
+        folderView.setPageParam(pageParam);
+
+        // 文件夹内文件夹逻辑
+        List<Folder> folders = folderService.listFolders(request, currentFolder);
+        ArrayList<Folder> checkedFolders = new ArrayList<>();
+        ArrayList<String> foldersPermission = new ArrayList<>();
+        for (Folder folder : folders) { //文件夹权限校验
+            String permission = folderService.checkFolderPermission(currentUser, folder);
+            if(folder.getFolder_type() == 0){
+                continue;
+            }
+            checkedFolders.add(folder);
+            foldersPermission.add(permission);
+        }
+        folderView.setFolders(checkedFolders);
+        folderView.setFoldersPermission(foldersPermission);
+        // 文件夹逻辑类似
+        List<FileNode> fileNodes = fileService.listFiles(request, currentFolder);
+        ArrayList<FileNode> checkedFiles = new ArrayList<>();
+        ArrayList<String> filesPermission = new ArrayList<>();
+        for (FileNode fileNode : fileNodes) {
+            String permission = fileService.checkFilePermission(currentUser, fileNode);
+            if(fileNode.getFile_type()==0){
+                continue;
+            }
+            checkedFiles.add(fileNode);
+            filesPermission.add(permission);
+        }
+        folderView.setFiles(checkedFiles);
+        folderView.setFilesPermission(filesPermission);
+
+        return GsonUtil.instance().toJson(folderView);
+    }
 
 
     // 上传文件
