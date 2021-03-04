@@ -190,7 +190,8 @@ function createAccountDeskTableRow(data){
     row.appendChild(name)
 
     let sex = document.createElement('td');
-    sex.innerHTML = "<a>" + data["sex"] + "</a>";
+    let sexStr = data["sex"]===0?"男":"女"
+    sex.innerHTML = "<a>" + sexStr + "</a>";
     row.appendChild(sex)
 
     let studentId = document.createElement('td');
@@ -215,9 +216,9 @@ function createAccountDeskTableRow(data){
 
     let forbiddenBtn = document.createElement('button')
     if(data["login_forbidden"] === 0){
-        forbiddenBtn.innerHTML = '<button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="forbiddenLogin('+data.id+')">禁止登录</button>'
+        forbiddenBtn.innerHTML = '<button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="forbiddenLogin('+data["id"]+')">禁止登录</button>'
     }else {
-        forbiddenBtn.innerHTML = '<button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="forbiddenLogin('+data.id+')">开放登录</button>'
+        forbiddenBtn.innerHTML = '<button type="button" class="layui-btn layui-btn-sm layui-btn-normal" onclick="forbiddenLogin('+data["id"]+')">开放登录</button>'
     }
 
     row.appendChild(forbiddenBtn)

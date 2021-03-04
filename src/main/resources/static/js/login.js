@@ -87,6 +87,9 @@ function sendLoginInfo(encryptedData){
         },
         success:function (data,textStatus,xhr){
             switch (data){
+                case "loginForbidden":
+                    alertConfirmTrans("已被禁止登录，请联系管理员");
+                    break;
                 case "success":
                     sessionStorage['lg_token'] = xhr.getResponseHeader('lg_token');
                     // 前页是系统内页面，则回退

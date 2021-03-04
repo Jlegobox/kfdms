@@ -157,6 +157,9 @@ public class UserService {
 
             int count = userMapper.login(user);
             if (count > 0) { //找到user
+                user = userMapper.findOneByEmail(user);
+                if(user.getLogin_forbidden() == 1)
+                    return "loginForbidden";
                 String token = UserUtil.updateToken(loginInfo);
                 response.setHeader("lg_token", token);
                 return_msg = "success";
