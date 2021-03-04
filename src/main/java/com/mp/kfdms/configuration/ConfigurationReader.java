@@ -35,7 +35,8 @@ public class ConfigurationReader {
             synchronized (ConfigurationReader.class) {
                 if (ConfigurationReader.instance == null) {
                     ConfigurationReader.instance = new ConfigurationReader();
-                    InputStream resourceAsStream = ConfigurationReader.class.getClassLoader().getResourceAsStream("/application.properties");
+                    instance.configurations = new HashMap<>();
+                    InputStream resourceAsStream = ConfigurationReader.class.getClassLoader().getResourceAsStream("application.properties");
                     Properties properties = new Properties();
                     try {
                         properties.load(resourceAsStream);
@@ -56,7 +57,6 @@ public class ConfigurationReader {
 
 
     public ConfigurationReader() {
-        configurations = new HashMap<String, String>();
     }
 
     public String getConf(String key) {

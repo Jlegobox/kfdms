@@ -1,6 +1,7 @@
 package com.mp.kfdms.controller;
 
 import com.mp.kfdms.annotation.CurrentUser;
+import com.mp.kfdms.configuration.ConfigurationReader;
 import com.mp.kfdms.domain.User;
 import com.mp.kfdms.domain.VerificationLog;
 import com.mp.kfdms.pojo.JsonModel;
@@ -79,5 +80,25 @@ public class AccountController {
     @RequestMapping("/setLoginForbidden.ajax")
     public String setLoginForbidden(@CurrentUser User currentUser, int userId){
         return userService.setLoginForbidden(currentUser,userId);
+    }
+
+    @RequestMapping("/getInviteMode.ajax")
+    public String getInviteMode(){
+        return ConfigurationReader.instance().getConf("sys.login.inviteMode");
+    }
+
+    @RequestMapping("/changeInviteMode.ajax")
+    public String changeInviteMode(@CurrentUser User currentUser){
+        if(currentUser.getUser_type() != 0){
+            return "authError";
+        }
+        String inviteMode = ConfigurationReader.instance().getConf("sys.login.inviteMode");
+        if(inviteMode!=null){
+            int i = Integer.parseInt(inviteMode);
+            ConfigurationReader.instance().setConf("sys.login.inviteMode",String.valueOf(1-i));
+        }else {
+            ConfigurationReader.instance().setConf("sys.login.inviteMode","0");
+        }
+        return ConfigurationReader.instance().getConf("sys.login.inviteMode");
     }
 }

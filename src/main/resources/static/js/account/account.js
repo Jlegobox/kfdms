@@ -162,6 +162,7 @@ function initAccountDesk(){
             }
         }
     })
+    getInviteMode();
 }
 var accountInfoTemplate ={
     "name":"",
@@ -238,6 +239,60 @@ function forbiddenLogin(id){
         },
         error:function (result){
             alertConfirmTrans("error");
+        }
+    })
+}
+
+function getInviteMode(){
+    $.ajax({
+        url:"/Account/getInviteMode.ajax",
+        type:"POST",
+        success:function (result){
+            if(result!=null){
+                switch (result){
+                    case "0":{
+                        $("#inviteModeBtn").text("开启邀请模式");
+                        break;
+                    }
+                    case "1":{
+                        $("#inviteModeBtn").text("关闭邀请模式");
+                        break;
+                    }
+                }
+            }
+        },
+        error:function (result){
+            alertConfirmTrans("服务器异常，请刷新后再试")
+        }
+    })
+}
+
+function changeInviteMode(){
+    $.ajax({
+        url:"/Account/changeInviteMode.ajax",
+        type:"GET",
+        beforeSend:function (xhr){
+            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
+        },
+        success:function (result){
+            if(result!=null){
+                switch (result){
+                    case "0":{
+                        $("#inviteModeBtn").text("开启邀请模式");
+                        break;
+                    }
+                    case "1":{
+                        $("#inviteModeBtn").text("关闭邀请模式");
+                        break;
+                    }
+                    default:{
+                        alertConfirmTrans(result);
+                    }
+                }
+            }
+        },
+        error:function (result){
+            alertConfirmTrans("服务器异常，请刷新后再试")
         }
     })
 }
