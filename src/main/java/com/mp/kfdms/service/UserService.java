@@ -1,5 +1,6 @@
 package com.mp.kfdms.service;
 
+import com.mp.kfdms.configuration.ConfigurationReader;
 import com.mp.kfdms.domain.VerificationLog;
 import com.mp.kfdms.mapper.FolderMapper;
 import com.mp.kfdms.mapper.UserMapper;
@@ -79,6 +80,21 @@ public class UserService {
             user.setPassword(registerInfo.getPassword());
             user.setVerification(registerInfo.getVerification_code());// 邀请码逻辑
             user.setUsername(UUID.randomUUID().toString());
+
+            // 邀请码检验
+            if(user.getVerification() !=null && user.getVerification().length()>1){ // 存在输入的邀请码就检验一下
+                VerificationLog oneByVerification = verificationLogMapper.findOneByVerification(user.getVerification());
+                if(oneByVerification == null){
+                    return "errorInviteCode";
+                }else if(oneByVerification.getIsUsed() == 1){
+                    return "expiredInviteCode";
+                }
+            }
+            if("1".equals(ConfigurationReader.instance().getConf("sys.login.inviteMode")) ){ // 邀请模式开启
+                if(user.getVerification() == null || user.getVerification().length()<1){ // 前面输入错误的情况已经检验，这里排除没有输入的情况
+                    return "needInvite";
+                }
+            }
             User exist_user = userMapper.findOneByEmail(user);
             if (exist_user != null) {
                 return_msg = "exist";

@@ -37,8 +37,14 @@ function sendRegisterInfo(encryptedData){
             switch (result){
                 case "success":
                     window.location.href="login.html";break;
+                case "errorInviteCode":
+                    alertConfirmTrans("错误的邀请码");break;
+                case "expiredInviteCode":
+                    alertConfirmTrans("邀请码已过期");break;
+                case "needInvite":
+                    alertConfirmTrans("需要邀请码");break;
                 case "error":
-                    alert("注册失败");break;
+                    alertConfirmTrans("注册失败");break;
             }
         },
         error:function (result){

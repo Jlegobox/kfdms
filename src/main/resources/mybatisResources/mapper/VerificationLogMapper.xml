@@ -25,7 +25,7 @@
     <select id="findAll" parameterType="java.lang.Integer" resultMap="baseResultMap">
         select * from verification_log where verification_owner = #{verificationOwner}
     </select>
-    <select id="findOneByVerification" parameterType="java.lang.String">
+    <select id="findOneByVerification" parameterType="java.lang.String" resultMap="baseResultMap">
         select * from verification_log where verification_code = #{verificationCode};
     </select>
 </mapper>
