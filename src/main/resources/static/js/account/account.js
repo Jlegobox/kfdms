@@ -146,3 +146,98 @@ function refreshCode(){
         }
     })
 }
+
+function initAccountDesk(){
+    $.ajax({
+        url:"/Account/getAllAccount.ajax",
+        type:"POST",
+        beforeSend:function (xhr){
+            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
+        },
+        success:function (result){
+            result = JSON.parse(result);
+            switch (result.message){
+                case "success": loadAccountDesk(result["data"]);break;
+                case "authError":alertConfirmTrans("无权限");break;
+            }
+        }
+    })
+}
+var accountInfoTemplate ={
+    "name":"",
+    "sex":"",
+    "studentId":"",
+    "email":"",
+    "telephone":"",
+    "lastLogin":"",
+    "verification":""
+}
+function loadAccountDesk(data){
+    let tbody = document.getElementById("accountDesk_tbody");
+    tbody.innerHTML = "";
+    for(let i=0;i<data.length;i++){
+        let row = createAccountDeskTableRow(data[i]);
+        tbody.appendChild(row);
+    }
+}
+
+function createAccountDeskTableRow(data){
+    let row = document.createElement('tr');
+
+    let name = document.createElement('td');
+    name.innerHTML = "<a><b>" + data["username"] + "</b></a>";
+    row.appendChild(name)
+
+    let sex = document.createElement('td');
+    sex.innerHTML = "<a>" + data["sex"] + "</a>";
+    row.appendChild(sex)
+
+    let studentId = document.createElement('td');
+    studentId.innerHTML = "<a>" + data["student_id"] + "</a>";
+    row.appendChild(studentId)
+
+    let email = document.createElement('td');
+    email.innerHTML = "<a>" + data["email"] + "</a>";
+    row.appendChild(email)
+
+    let telephone = document.createElement('td');
+    telephone.innerHTML = "<a>" + data["telephone"] + "</a>";
+    row.appendChild(telephone)
+
+    let lastLogin = document.createElement('td');
+    lastLogin.innerHTML = "<a>" + data["last_login"] + "</a>";
+    row.appendChild(lastLogin)
+
+    let verification = document.createElement('td');
+    verification.innerHTML = "<a>" + data["verification"] + "</a>";
+    row.appendChild(verification)
+
+    let forbiddenBtn = document.createElement('button')
+    if(data["login_forbidden"] === 0){
+        forbiddenBtn.innerHTML = '<button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="forbiddenLogin('+data.id+')">禁止登录</button>'
+    }else {
+        forbiddenBtn.innerHTML = '<button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="forbiddenLogin('+data.id+')">开放登录</button>'
+    }
+
+    row.appendChild(forbiddenBtn)
+    return row;
+}
+
+function forbiddenLogin(id){
+    $.ajax({
+        url:"/Account/setLoginForbidden.ajax",
+        type:"POST",
+        data:{
+            "userId":id
+        },
+        beforeSend:function (xhr){
+            xhr.setRequestHeader('lg_token', sessionStorage['lg_token'])
+        },
+        success:function (result){
+            initAccountDesk();
+        },
+        error:function (result){
+            alertConfirmTrans("error");
+        }
+    })
+}

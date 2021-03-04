@@ -10,6 +10,7 @@
         <result column="user_type" jdbcType="INTEGER" property="user_type" />
         <result column="verification_id" jdbcType="INTEGER" property="verification_id" />
         <result column="active_status" jdbcType="INTEGER" property="active_status" />
+        <result column="login_forbidden" jdbcType="INTEGER" property="login_forbidden" />
         <result column="base_folder_id" jdbcType="VARCHAR" property="base_folder_id"/>
         <result column="image_path" jdbcType="VARCHAR" property="image_path"/>
         <result column="register_time" jdbcType="TIME" property="tegister_time"/>
@@ -48,6 +49,9 @@
     <update id="changeUserName" parameterType="com.mp.kfdms.domain.User">
         update user set username=#{username} where email=#{email};
     </update>
+    <update id="setLoginForbidden" parameterType="java.lang.Integer">
+        update user set login_forbidden=(1-login_forbidden) where id=#{id};
+    </update>
     <update id="setBaseFolderId" parameterType="com.mp.kfdms.domain.User">
         update user set base_folder_id=#{base_folder_id} where email=#{email};
     </update>
@@ -55,5 +59,11 @@
         update user set telephone=#{telephone},username=#{username},user_type=#{user_type},
         sex=#{sex},student_id=#{student_id},birthday=#{birthday},start_year=#{start_year} where email=#{email}
     </update>
+    <select id="findOneById" parameterType="java.lang.Integer" resultType="com.mp.kfdms.domain.User">
+        select * from user where id=#{id};
+    </select>
+    <select id="findAll" resultType="com.mp.kfdms.domain.User">
+        select * from user;
+    </select>
 
 </mapper>

@@ -6,6 +6,7 @@ import com.mp.kfdms.domain.VerificationLog;
 import com.mp.kfdms.pojo.JsonModel;
 import com.mp.kfdms.service.UserService;
 import com.mp.kfdms.util.GsonUtil;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -67,5 +68,16 @@ public class AccountController {
     @RequestMapping("/refreshInviteCode.ajax")
     public String refreshInviteCode(@CurrentUser User currentUser){
         return userService.refreshInviteCode(currentUser);
+    }
+
+    @RequestMapping("/getAllAccount.ajax")
+    public String getAllAccount(@CurrentUser User currentUser){
+        JsonModel allAccount = userService.getAllAccount(currentUser);
+        return GsonUtil.instance().toJson(allAccount);
+    }
+
+    @RequestMapping("/setLoginForbidden.ajax")
+    public String setLoginForbidden(@CurrentUser User currentUser, int userId){
+        return userService.setLoginForbidden(currentUser,userId);
     }
 }

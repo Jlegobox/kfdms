@@ -276,4 +276,35 @@ public class UserService {
         String inviteCode = createInviteCode(currentUser);
         return inviteCode;
     }
+
+    public JsonModel getAllAccount(User currentUser) {
+        JsonModel jsonModel = new JsonModel();
+        if(currentUser.getUser_type() != 0){
+            jsonModel.setMessage("authError");
+            return jsonModel;
+        }
+        List<User> allUser = userMapper.findAll();
+        for (User user : allUser) {
+            try{
+                VerificationLog oneByVerification = verificationLogMapper.findOneByVerification(user.getVerification());
+                User oneById = userMapper.findOneById(oneByVerification.getVerificationOwner());
+                if(oneById!=null){
+                    user.setVerification(oneById.getUsername());
+                }
+            }catch (Exception e){
+                user.setVerification("");
+            }
+        }
+        jsonModel.setMessage("success");
+        jsonModel.setData(allUser);
+        return jsonModel;
+    }
+
+    public String setLoginForbidden(User currentUser, int userId) {
+        if(currentUser.getUser_type() !=0 ){
+            return "authError";
+        }
+        userMapper.setLoginForbidden(userId);
+        return "success";
+    }
 }

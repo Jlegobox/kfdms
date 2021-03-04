@@ -28,4 +28,8 @@ public interface UserMapper {
     public int setBaseFolderId(User user);
 
     public int updateUser(User currentUser);
+
+    public User findOneById(int id);
+
+    public int setLoginForbidden(int userId);
 }

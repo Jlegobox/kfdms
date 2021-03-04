@@ -17,4 +17,6 @@ public interface VerificationLogMapper {
     public int updateLog(VerificationLog verificationLog);
     public VerificationLog findOne(int ownerId);
     public List<VerificationLog> findAll(int ownerId);
+
+    public VerificationLog findOneByVerification(String verificationCode);
 }

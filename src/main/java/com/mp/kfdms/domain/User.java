@@ -21,6 +21,7 @@ public class User {
     public int user_type;
     public String verification;
     public int active_status;
+    public int login_forbidden;
     public int base_folder_id;
     public String image_path;
     public Date register_time;
@@ -120,6 +121,14 @@ public class User {
 
     public void setActive_status(int active_status) {
         this.active_status = active_status;
+    }
+
+    public int getLogin_forbidden() {
+        return login_forbidden;
+    }
+
+    public void setLogin_forbidden(int login_forbidden) {
+        this.login_forbidden = login_forbidden;
     }
 
     public int getBase_folder_id() {
