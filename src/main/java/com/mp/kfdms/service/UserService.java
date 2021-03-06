@@ -1,6 +1,7 @@
 package com.mp.kfdms.service;
 
 import com.mp.kfdms.configuration.ConfigurationReader;
+import com.mp.kfdms.domain.Folder;
 import com.mp.kfdms.domain.VerificationLog;
 import com.mp.kfdms.mapper.FolderMapper;
 import com.mp.kfdms.mapper.UserMapper;
@@ -60,7 +61,8 @@ public class UserService {
 
     public String doRegister(final HttpServletRequest request, final HttpServletResponse response) {
         // todo 注册许可检验
-        final String encrypted = request.getParameter("RegisterInfo");
+        final String encrypted = request.getParameter("registerInfo");
+        final String verificationCode = request.getParameter("verificationCode");
         try {
             final String encryptedStr = RSAKeyUtil.dncryption(encrypted, RSAKeyUtil.getPrivateKey());
             RegisterInfo registerInfo = GsonUtil.instance().fromJson(encryptedStr, RegisterInfo.class);
@@ -78,20 +80,20 @@ public class UserService {
             User user = new User();
             user.setEmail(registerInfo.getEmail());
             user.setPassword(registerInfo.getPassword());
-            user.setVerification(registerInfo.getVerification_code());// 邀请码逻辑
+            user.setVerification(verificationCode == null ? "" : verificationCode);// 邀请码逻辑
             user.setUsername(UUID.randomUUID().toString());
 
             // 邀请码检验
-            if(user.getVerification() !=null && user.getVerification().length()>1){ // 存在输入的邀请码就检验一下
+            if (user.getVerification() != null && user.getVerification().length() > 1) { // 存在输入的邀请码就检验一下
                 VerificationLog oneByVerification = verificationLogMapper.findOneByVerification(user.getVerification());
-                if(oneByVerification == null){
+                if (oneByVerification == null) {
                     return "errorInviteCode";
-                }else if(oneByVerification.getIsUsed() == 1){
+                } else if (oneByVerification.getIsUsed() == 0) {
                     return "expiredInviteCode";
                 }
             }
-            if("1".equals(ConfigurationReader.instance().getConf("sys.login.inviteMode")) ){ // 邀请模式开启
-                if(user.getVerification() == null || user.getVerification().length()<1){ // 前面输入错误的情况已经检验，这里排除没有输入的情况
+            if ("1".equals(ConfigurationReader.instance().getConf("sys.login.inviteMode"))) { // 邀请模式开启
+                if (user.getVerification() == null || user.getVerification().length() < 1) { // 前面输入错误的情况已经检验，这里排除没有输入的情况
                     return "needInvite";
                 }
             }
@@ -125,14 +127,15 @@ public class UserService {
         }
         try {
             User oneByEmail = userMapper.findOneByEmail(user);
-            String baerFolder = folderService.createBaseFolder(oneByEmail);
-            if ("error".equals(baerFolder)) {
-                return_msg = "activate_error";// 激活策略
-            } else {
+            Folder baerFolder = folderService.createBaseFolder(oneByEmail);
+            if (baerFolder != null) {
+                oneByEmail.setBase_folder_id(baerFolder.getFolder_id());
+                userMapper.updateUser(oneByEmail);
                 return_msg = "success";
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+            return "activate_error";
         }
         return return_msg;
     }
@@ -158,7 +161,7 @@ public class UserService {
             int count = userMapper.login(user);
             if (count > 0) { //找到user
                 user = userMapper.findOneByEmail(user);
-                if(user.getLogin_forbidden() == 1)
+                if (user.getLogin_forbidden() == 1)
                     return "loginForbidden";
                 String token = UserUtil.updateToken(loginInfo);
                 response.setHeader("lg_token", token);
@@ -262,12 +265,12 @@ public class UserService {
     }
 
     public String createInviteCode(User currentUser) {
-        try{
+        try {
             VerificationLog one = verificationLogMapper.findOne(currentUser.getId());
             one.setIsUsed(0); // 废弃
             one.setDropTime(new Date());
             verificationLogMapper.updateLog(one);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -281,12 +284,12 @@ public class UserService {
         return verificationLog.getVerificationCode();
     }
 
-    public VerificationLog showVerificationLog(User currentUser){
-        if(currentUser!=null){
+    public VerificationLog showVerificationLog(User currentUser) {
+        if (currentUser != null) {
             VerificationLog one = verificationLogMapper.findOne(currentUser.getId());
             System.out.println("OK");
             return one;
-        }else {
+        } else {
             return null;
         }
     }
@@ -298,19 +301,19 @@ public class UserService {
 
     public JsonModel getAllAccount(User currentUser) {
         JsonModel jsonModel = new JsonModel();
-        if(currentUser.getUser_type() != 0){
+        if (currentUser.getUser_type() != 0) {
             jsonModel.setMessage("authError");
             return jsonModel;
         }
         List<User> allUser = userMapper.findAll();
         for (User user : allUser) {
-            try{
+            try {
                 VerificationLog oneByVerification = verificationLogMapper.findOneByVerification(user.getVerification());
                 User oneById = userMapper.findOneById(oneByVerification.getVerificationOwner());
-                if(oneById!=null){
+                if (oneById != null) {
                     user.setVerification(oneById.getUsername());
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 user.setVerification("");
             }
         }
@@ -320,7 +323,7 @@ public class UserService {
     }
 
     public String setLoginForbidden(User currentUser, int userId) {
-        if(currentUser.getUser_type() !=0 ){
+        if (currentUser.getUser_type() != 0) {
             return "authError";
         }
         userMapper.setLoginForbidden(userId);

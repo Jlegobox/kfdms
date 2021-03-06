@@ -57,7 +57,7 @@
     </update>
     <update id="updateUser" parameterType="com.mp.kfdms.domain.User">
         update user set telephone=#{telephone},username=#{username},user_type=#{user_type},
-        sex=#{sex},student_id=#{student_id},birthday=#{birthday},start_year=#{start_year} where email=#{email}
+        sex=#{sex},student_id=#{student_id},birthday=#{birthday},start_year=#{start_year},base_folder_id = #{base_folder_id} where email=#{email}
     </update>
     <select id="findOneById" parameterType="java.lang.Integer" resultType="com.mp.kfdms.domain.User">
         select * from user where id=#{id};

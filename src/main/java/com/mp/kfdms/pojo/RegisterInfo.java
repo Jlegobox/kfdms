@@ -9,7 +9,7 @@ package com.mp.kfdms.pojo;
 public class RegisterInfo {
     private String email;
     private String password;
-    private String verification_code;
+//    private String verification_code;
     private String time;
 
     public String getEmail() {
@@ -28,13 +28,13 @@ public class RegisterInfo {
         this.password = password;
     }
 
-    public String getVerification_code() {
-        return verification_code;
-    }
-
-    public void setVerification_code(String verification_code) {
-        this.verification_code = verification_code;
-    }
+//    public String getVerification_code() {
+//        return verification_code;
+//    }
+//
+//    public void setVerification_code(String verification_code) {
+//        this.verification_code = verification_code;
+//    }
 
     public String getTime() {
         return time;

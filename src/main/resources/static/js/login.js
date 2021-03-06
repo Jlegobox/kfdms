@@ -2,7 +2,7 @@
 function doRegister(){ //向指定url发送请求，有publickey验证
     var email = $("#email").val()
     var password = $("#password1").val()
-    var verification_code = $("#verification_code").val()
+    var verificationCode = $("#verification_code").val()
     $.ajax({
         url:'Login/getPublicKey',
         type:'POST',
@@ -14,10 +14,9 @@ function doRegister(){ //向指定url发送请求，有publickey验证
             encrypt.setPublicKey(publicKeyInfo.publicKey);
             var RegisterInfo = '{email:"' + email +
                 '",password:"'+password +
-                '",verification_code:"'+verification_code +
                 '",time:"' + publicKeyInfo.time + '"}';
             var encryptedData = encrypt.encrypt(RegisterInfo);
-            sendRegisterInfo(encryptedData);
+            sendRegisterInfo(encryptedData,verificationCode);
         },
         error:function (result){
             alert(result)
@@ -26,12 +25,13 @@ function doRegister(){ //向指定url发送请求，有publickey验证
     })
 }
 
-function sendRegisterInfo(encryptedData){
+function sendRegisterInfo(encryptedData,verificationCode){
     $.ajax({
         url:'Login/doRegister.ajax',
         type:'POST',
         data:{
-            RegisterInfo:encryptedData
+            "registerInfo":encryptedData,
+            "verificationCode":verificationCode
         },
         success:function (result){
             switch (result){
