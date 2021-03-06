@@ -82,6 +82,7 @@ public class UserService {
             user.setPassword(registerInfo.getPassword());
             user.setVerification(verificationCode == null ? "" : verificationCode);// 邀请码逻辑
             user.setUsername(UUID.randomUUID().toString());
+            user.setUser_type(1); // 默认为普通用户
 
             // 邀请码检验
             if (user.getVerification() != null && user.getVerification().length() > 1) { // 存在输入的邀请码就检验一下

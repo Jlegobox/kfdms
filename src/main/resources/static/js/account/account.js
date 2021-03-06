@@ -21,7 +21,7 @@ function initAccountInfo() {
                 document.getElementById("birthday").setAttribute("value", birthdayStr);
                 document.getElementById("email").setAttribute("value", data["email"]);
                 document.getElementById("phoneNumber").setAttribute("value", data["telephone"]);
-                $('#userType').val(data["user_type"] === "0" ? "普通用户" : "管理员");
+                $('#userType').val(data["user_type"] === 1 ? "普通用户" : "管理员");
                 document.getElementById("verification").setAttribute("value", data["verification"]);
             }
         }
