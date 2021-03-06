@@ -285,6 +285,7 @@ public class UserService {
     }
 
     public VerificationLog showVerificationLog(User currentUser) {
+        currentUser = userMapper.findOneByEmail(currentUser);
         if (currentUser != null) {
             VerificationLog one = verificationLogMapper.findOne(currentUser.getId());
             System.out.println("OK");
@@ -295,8 +296,12 @@ public class UserService {
     }
 
     public String refreshInviteCode(User currentUser) {
-        String inviteCode = createInviteCode(currentUser);
-        return inviteCode;
+        currentUser = userMapper.findOneByEmail(currentUser);
+        if(currentUser != null){
+            String inviteCode = createInviteCode(currentUser);
+            return inviteCode;
+        }
+        return "error";
     }
 
     public JsonModel getAllAccount(User currentUser) {

@@ -7,7 +7,7 @@
         <result column="verification_code" property="verificationCode"/>
         <result column="create_time" property="createTime"/>
         <result column="is_used" property="isUsed"/>
-        <result column="drop_time" property="DropTime"/>
+        <result column="drop_time" property="dropTime"/>
         <result column="used_user_email" property="usedUserEmail"/>
     </resultMap>
     <insert id="addLog" parameterType="com.mp.kfdms.domain.VerificationLog">
