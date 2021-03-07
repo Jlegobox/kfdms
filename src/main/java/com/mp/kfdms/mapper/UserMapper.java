@@ -33,5 +33,5 @@ public interface UserMapper {
 
     public int setLoginForbidden(int userId);
 
-    public User getUserByEmail();
+    public User getUserByEmail(String email);
 }

@@ -178,7 +178,7 @@ public class UserService {
     }
 
     public User getUserByEmail(String email){
-        User userByEmail = userMapper.getUserByEmail();
+        User userByEmail = userMapper.getUserByEmail(email);
         return userByEmail;
     }
 
@@ -223,28 +223,33 @@ public class UserService {
     }
 
     public String modifyAccountInfo(User currentUser, HttpServletRequest request) {
-        currentUser.setUsername(request.getParameter("username"));
-        currentUser.setSex(Integer.parseInt(request.getParameter("sex")));
-        currentUser.setStudent_id(request.getParameter("studentId"));
-        Date date = new Date();
-        try {
-            String birthday = request.getParameter("birthday");
-            SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
-            date = sdf.parse(birthday);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        currentUser.setBirthday(date);
-        currentUser.setStart_year(Integer.parseInt(request.getParameter("startYear")));
-        currentUser.setTelephone(request.getParameter("telephone"));
-        currentUser.setUser_type(Integer.parseInt(request.getParameter("userType")));
-        currentUser.setVerification(request.getParameter("verification"));
-        userMapper.updateUser(currentUser);
+        currentUser = userMapper.getUserByEmail(currentUser.getEmail());
+        if(currentUser!=null){
+            currentUser.setUsername(request.getParameter("username"));
+            currentUser.setSex(Integer.parseInt(request.getParameter("sex")));
+            currentUser.setStudent_id(request.getParameter("studentId"));
+            Date date = new Date();
+            try {
+                String birthday = request.getParameter("birthday");
+                SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
+                date = sdf.parse(birthday);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            currentUser.setBirthday(date);
+            currentUser.setStart_year(Integer.parseInt(request.getParameter("startYear")));
+            currentUser.setTelephone(request.getParameter("telephone"));
+            currentUser.setUser_type(Integer.parseInt(request.getParameter("userType")));
+            currentUser.setVerification(request.getParameter("verification"));
+            userMapper.updateUser(currentUser);
 
-        Folder baseFolderByUser = folderService.getBaseFolderByUser(currentUser);
-        baseFolderByUser.setFolder_name(currentUser.getUsername());
-        folderService.updateFolder(baseFolderByUser);
-        return "success";
+            // TODO: 2021/3/7 事务保证逻辑正确。更换前端通信方式
+            Folder baseFolderByUser = folderService.getBaseFolderByUser(currentUser);
+            baseFolderByUser.setFolder_name(currentUser.getUsername());
+            folderService.updateFolder(baseFolderByUser);
+            return "success";
+        }
+        return "error";
     }
 
     public String changePassword(User currentUser, String oldPass, String newPass) {
