@@ -13,7 +13,7 @@ function initFileSquare() {
     refreshFileSquare(squareFolderId)
 }
 
-// 刷新整个DataCloud 包括导航栏等
+// 刷新整个FileSqure 包括导航栏等
 function refreshFileSquare(folderId) {
     squareFolderId = folderId
     refreshSquareNavigation(folderId)
