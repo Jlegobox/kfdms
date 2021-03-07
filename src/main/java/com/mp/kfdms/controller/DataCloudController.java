@@ -48,6 +48,7 @@ public class DataCloudController {
         User currentUser = null;
         try{
             currentUser = UserUtil.getUserFromToken(request.getHeader("lg_token"));
+            currentUser = userService.getUserByEmail(currentUser.email);
         }catch (Exception e){
             e.printStackTrace();
         }

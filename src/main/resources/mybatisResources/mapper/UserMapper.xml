@@ -22,6 +22,9 @@
     <select id="findOneByEmail" resultType="com.mp.kfdms.domain.User" parameterType="com.mp.kfdms.domain.User">
         select * from user where email=#{email} limit 1;
     </select>
+    <select id="getUserByEmail" resultType="com.mp.kfdms.domain.User" parameterType="java.lang.String">
+        select * from user where email=#{email} limit 1;
+    </select>
     <select id="findOneByTelephone" resultType="com.mp.kfdms.domain.User" parameterType="com.mp.kfdms.domain.User">
         select * from user where telephone=#{telephone} limit 1;
     </select>

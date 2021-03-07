@@ -177,6 +177,11 @@ public class UserService {
         }
     }
 
+    public User getUserByEmail(String email){
+        User userByEmail = userMapper.getUserByEmail();
+        return userByEmail;
+    }
+
     public boolean checkToken(String token) {
         User userFromToken = UserUtil.getUserFromToken(token);
         int login = userMapper.login(userFromToken);
@@ -235,6 +240,10 @@ public class UserService {
         currentUser.setUser_type(Integer.parseInt(request.getParameter("userType")));
         currentUser.setVerification(request.getParameter("verification"));
         userMapper.updateUser(currentUser);
+
+        Folder baseFolderByUser = folderService.getBaseFolderByUser(currentUser);
+        baseFolderByUser.setFolder_name(currentUser.getUsername());
+        folderService.updateFolder(baseFolderByUser);
         return "success";
     }
 
