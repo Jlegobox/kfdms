@@ -20,6 +20,7 @@
         // 是否开启刷新记忆tab功能
         // var is_remember = false;
         home_check_token();
+        initHome();
     </script>
 </head>
 <body>
@@ -29,19 +30,21 @@
         <div class="left_open">
             <i title="展开左侧栏" class="iconfont">&#xe699;</i>
         </div>
-        <ul class="layui-nav left fast-add" lay-filter="">
-          <li class="layui-nav-item">
-            <a href="javascript:;">通知</a>
-            <dl class="layui-nav-child"> <!-- 二级菜单 -->
-              <dd><a onclick="x_admin_show('资讯','https://www.baidu.com')"><i class="layui-icon">&#xe667;</i>查看所有通知</a></dd>
-              <dd><a onclick="x_admin_show('图片','https://www.baidu.com')"><i class="layui-icon">&#xe609;</i>发布通知</a></dd>
-            </dl>
-          </li>
-        </ul>
+        <!-- todo 通知模块-->
+<!--        <ul class="layui-nav left fast-add" lay-filter="">-->
+<!--          <li class="layui-nav-item">-->
+<!--            <a href="javascript:;">通知</a>-->
+<!--            <dl class="layui-nav-child"> &lt;!&ndash; 二级菜单 &ndash;&gt;-->
+<!--              <dd><a onclick="x_admin_show('资讯','https://www.baidu.com')"><i class="layui-icon">&#xe667;</i>查看所有通知</a></dd>-->
+<!--              <dd><a onclick="x_admin_show('图片','https://www.baidu.com')"><i class="layui-icon">&#xe609;</i>发布通知</a></dd>-->
+<!--            </dl>-->
+<!--          </li>-->
+<!--        </ul>-->
         <ul class="layui-nav right" lay-filter="">
           <li class="layui-nav-item">
             <a href="javascript:;">
-                <img src="./images/bg.png" class="layui-nav-img"> <!-- 不能展示分辨率太高的图片-->
+                <!-- todo 暂时不支持图片-->
+<!--                <img src="./images/bg.png" class="layui-nav-img"> &lt;!&ndash; 不能展示分辨率太高的图片&ndash;&gt;-->
                 <span id="accountName" >admin</span>
             </a>
             <dl class="layui-nav-child"> <!-- 二级菜单 -->
@@ -118,7 +121,7 @@
                     <i class="iconfont nav_right">&#xe697;</i>
                 </a>
             </li>
-            <li id="manageMenu">
+            <li id="manageMenu" style="display:none;">
                 <a href="javascript:;">
                     <i class="iconfont">&#xe723;</i>
                     <cite>管理员菜单</cite>

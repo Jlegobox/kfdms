@@ -1,9 +1,12 @@
 package com.mp.kfdms.controller;
 
 import com.mp.kfdms.domain.Folder;
+import com.mp.kfdms.domain.User;
+import com.mp.kfdms.pojo.JsonModel;
 import com.mp.kfdms.service.FileService;
 import com.mp.kfdms.service.FolderService;
 import com.mp.kfdms.service.UserService;
+import com.mp.kfdms.util.GsonUtil;
 import com.mp.kfdms.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -52,6 +55,20 @@ public class WelcomeController {
         }else {
             return "error";
         }
+    }
+
+    @RequestMapping(value = {"/initHome.ajax"})
+    @ResponseBody
+    public String getCurrentUser(final HttpServletRequest request){
+        JsonModel jsonModel = new JsonModel();
+        User currentUser = userservice.getUserFromToken(request.getHeader("lg_token"));
+        if(currentUser!=null){
+            jsonModel.setMessage("success");
+            jsonModel.setData(currentUser);
+        }else {
+            jsonModel.setMessage("error");
+        }
+        return GsonUtil.instance().toJson(jsonModel);
     }
 
 }
