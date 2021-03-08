@@ -57,4 +57,6 @@ public interface FileNodeMapper {
     public FileNode getFileById(int fileId);
 
     public int updateFileNode(FileNode fileNode);
+
+    List<FileNode> getFileByParentFolder(int folderId);
 }

@@ -227,9 +227,8 @@ public class FileService {
         return FileUtil.checkFileInfo(fileInfo) && FileUtil.checkFileSlice(fileInfo);
     }
 
-    public String deleteFile(HttpServletRequest request, int fileId) {
-        User user = UserUtil.getUserFromToken(request.getHeader("lg_token"));
-        boolean auth = userService.checkDeleteAuth();
+    public String deleteFile(User currentUser, HttpServletRequest request, int fileId) {
+        boolean auth = userService.checkDeleteAuth(currentUser);
         if (auth) {
             FileNode deleteFile = fileNodeMapper.getFileById(fileId);
             int count = fileNodeMapper.deleteFileById(fileId);
@@ -292,6 +291,10 @@ public class FileService {
             return "error";
         }
         return "success";
+    }
+
+    public List<FileNode> getFilesByParentFolder(int folderId){
+        return fileNodeMapper.getFileByParentFolder(folderId);
     }
 
 

@@ -459,19 +459,15 @@ function delFile(fileId, isFolder) {
         },
         success: function (result) {
             switch (result) {
-                case "not empty": {
-                    alert("文件夹不为空");
-                    break;
-                }
-                case "sucess": {
+                case "success": {
                     if (isFolder)
-                        alert("文件夹已删除");
+                        alertConfirmTrans("文件夹已删除");
                     else
-                        alert("文件已被删除");
+                        alertConfirmTrans("文件已被删除");
                     break;
                 }
                 case "error": {
-                    alert("删除失败");
+                    alertConfirmTrans("删除失败");
                 }
             }
 

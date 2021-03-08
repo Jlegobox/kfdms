@@ -1,5 +1,7 @@
 package com.mp.kfdms.service;
 
+import com.mp.kfdms.annotation.CurrentUser;
+import com.mp.kfdms.domain.FileNode;
 import com.mp.kfdms.domain.Folder;
 import com.mp.kfdms.domain.User;
 import com.mp.kfdms.mapper.FolderMapper;
@@ -11,6 +13,7 @@ import com.mp.kfdms.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -150,18 +153,38 @@ public class FolderService {
         return i + j;
     }
 
-    public String deleteFolder(HttpServletRequest request, int fileId) {
-        User user = UserUtil.getUserFromToken(request.getHeader("lg_token"));
-        boolean auth = userService.checkDeleteAuth();
+    /**
+     * 循环访问删除文件夹内内容
+     * @param currentUser
+     * @param request
+     * @param folder
+     * @return
+     */
+    public boolean doDeleteFolder(User currentUser, HttpServletRequest request,Folder folder){
+        List<Folder> innerFolders = folderMapper.getFolderByFolderParentId(folder.getFolder_id());
+        List<FileNode> innerFiles = fileService.getFilesByParentFolder(folder.getFolder_id());
+        try{
+            for (FileNode innerFile : innerFiles) {
+                fileService.deleteFile(currentUser,request,innerFile.getFile_id());
+            }
+            for (Folder innerFolder : innerFolders) {
+                doDeleteFolder(currentUser, request, innerFolder);
+            }
+            if(getTotalCount(folder)==0){
+                folderMapper.deleteFolderById(folder.getFolder_id());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public String deleteFolder(User currentUser, HttpServletRequest request, int fileId) {
+        boolean auth = userService.checkDeleteAuth(currentUser);
         if (auth) {
-            Folder currentFolder = new Folder();
-            currentFolder.setFolder_id(fileId);
-            int totalCountFolder = getTotalCount(currentFolder);
-            int totalCountFile = fileService.getTotalCount(currentFolder);
-            if (totalCountFile + totalCountFolder > 0)
-                return "not empty";
-            int count = folderMapper.deleteFolderById(fileId);
-            if (count >= 1)
+            Folder currentFolder = folderMapper.getFolderById(fileId);
+            if (doDeleteFolder(currentUser,request,currentFolder))
                 return "success";
         }
         return "error";

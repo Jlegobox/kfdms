@@ -202,7 +202,7 @@ public class UserService {
         return true;
     }
 
-    public boolean checkDeleteAuth() {
+    public boolean checkDeleteAuth(User user) {
         return true;
     }
 

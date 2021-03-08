@@ -1,5 +1,6 @@
 package com.mp.kfdms.controller;
 
+import com.mp.kfdms.annotation.CurrentUser;
 import com.mp.kfdms.domain.FileNode;
 import com.mp.kfdms.domain.Folder;
 import com.mp.kfdms.domain.User;
@@ -102,12 +103,12 @@ public class DataCloudController {
      * @return
      */
     @RequestMapping("deleteFile.ajax")
-    public String deleteFile(final HttpServletRequest request,final int fileId, final int fileType){
+    public String deleteFile(@CurrentUser User currentUser, final HttpServletRequest request, final int fileId, final int fileType){
         String returnMSG = "error";
         if(fileType == 1){ // 文件夹
-            returnMSG = folderService.deleteFolder(request, fileId);
+            returnMSG = folderService.deleteFolder(currentUser,request, fileId);
         }else{
-            returnMSG = fileService.deleteFile(request, fileId);
+            returnMSG = fileService.deleteFile(currentUser,request, fileId);
         }
         return returnMSG;
     }
