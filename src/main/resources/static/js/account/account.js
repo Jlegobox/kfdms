@@ -54,9 +54,9 @@ function modifyAccountInfo() {
     accountInfo["telephone"] = $("#phoneNumber").val();
     let userType = $("#userType").val();
     if (userType === "管理员") {
-        accountInfo["userType"] = 1;
-    } else if (userType === "普通用户") {
         accountInfo["userType"] = 0;
+    } else if (userType === "普通用户") {
+        accountInfo["userType"] = 1;
     }
 
     $.ajax({
