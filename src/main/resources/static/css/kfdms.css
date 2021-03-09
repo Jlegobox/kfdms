@@ -4,6 +4,12 @@
     background-size: cover;
     overflow: hidden;
 }
+.welcome-bg{
+    /*background: #eeeeee url() 0 0 no-repeat;*/
+    background:url(../images/welcome_bg.png) no-repeat center;
+    background-size: cover;
+    overflow: hidden;
+}
 .shareAccessBlock{
     margin: 240px auto 0 auto;
     min-height: 120px;
