@@ -92,6 +92,8 @@ public class UserService {
                 } else if (oneByVerification.getIsUsed() == 0) {
                     return "expiredInviteCode";
                 }
+                if(oneByVerification.getVerificationOwner() == -1) // 管理员注册码
+                    user.setUser_type(0);
             }
             if ("1".equals(ConfigurationReader.instance().getConf("sys.login.inviteMode"))) { // 邀请模式开启
                 if (user.getVerification() == null || user.getVerification().length() < 1) { // 前面输入错误的情况已经检验，这里排除没有输入的情况
