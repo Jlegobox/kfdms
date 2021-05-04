@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  * @Time 14:43
  */
 @RestController
+@RequestMapping("/upload")
 public class UploadController {
     @Resource
     private FileService fileService;
@@ -26,13 +27,8 @@ public class UploadController {
     @Resource
     private FolderService folderService;
 
-    /**
-     * 上传单个文件
-     * @param request
-     * @param response
-     * @param file
-     * @return
-     */
+
+
 
 
 }

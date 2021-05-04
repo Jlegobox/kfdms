@@ -38,7 +38,8 @@ public class MailUtils {
         } else {
             javaMailSender.setHost("smtp.163.com");
         }
-        javaMailSender.setPort(25); // 25端口为非SSL 465/994为SSL协议端口号
+        // 25端口为非SSL 465/994为SSL协议端口号
+        javaMailSender.setPort(25);
         javaMailSender.setProtocol("smtp");
         javaMailSender.setUsername(username);
         javaMailSender.setPassword(password);
